@@ -1,8 +1,8 @@
 {
   "status": "DISCONNECTED",
-  "phoneNumber": null,
+  "phoneNumber": "",
   "deviceName": "Reviewwo WhatsApp Gateway (Sovereign Socket)",
-  "connectedAt": "2026-11-07T13:11:28.287Z",
+  "connectedAt": "2026-11-07T13:42:11.228Z",
   "batteryLevel": 100,
   "totalDispatches": 0,
   "smsFeesSaved": "₹0",

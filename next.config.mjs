@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  serverExternalPackages: ['@whiskeysockets/baileys', 'pino', 'qrcode', 'bcryptjs'],
   async rewrites() {
     return [
       {
