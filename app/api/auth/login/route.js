@@ -10,9 +10,31 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
     }
 
-    const users = loadData('users.json', []);
+    let users = loadData('users.json', []);
     const cleanEmail = email.trim().toLowerCase();
-    const userIndex = users.findIndex(u => u.email && u.email.toLowerCase() === cleanEmail);
+    let userIndex = users.findIndex(u => u.email && u.email.toLowerCase() === cleanEmail);
+
+    // Auto-seed admin if missing from disk on initial deployment
+    if (userIndex === -1 && cleanEmail === 'admin@divergit.com') {
+      const defaultAdmin = {
+        id: 'usr_divergit_admin',
+        name: 'Divergit Admin',
+        businessName: 'Divergit',
+        mobile: '+919876543210',
+        email: 'admin@divergit.com',
+        password: bcrypt.hashSync('Password123!', 10),
+        plan: 'agency',
+        planPrice: 799,
+        createdAt: new Date().toISOString(),
+        role: 'admin',
+        googlePlaceId: '',
+        googleRating: 5.0,
+        reviewCount: 0
+      };
+      users.unshift(defaultAdmin);
+      saveData('users.json', users);
+      userIndex = 0;
+    }
 
     if (userIndex === -1) {
       return NextResponse.json({ error: 'No account found with this email. Please register first.' }, { status: 401 });

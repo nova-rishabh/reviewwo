@@ -18,9 +18,28 @@ export function getDataFilePath(filename) {
 
 export function loadData(filename, fallback = []) {
   try {
-    const fullPath = getDataFilePath(filename);
+    const safeName = path.basename(filename);
+    const fullPath = getDataFilePath(safeName);
+
+    // 1. If it exists in the active data directory, return it
     if (fs.existsSync(fullPath)) {
-      return JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+      const content = fs.readFileSync(fullPath, 'utf8').trim();
+      if (content) {
+        return JSON.parse(content);
+      }
+    }
+
+    // 2. If missing from the persistent disk volume, load and seed from bundled project data
+    const bundledPath = path.join(process.cwd(), 'data', safeName);
+    if (bundledPath !== fullPath && fs.existsSync(bundledPath)) {
+      const bundledContent = fs.readFileSync(bundledPath, 'utf8').trim();
+      if (bundledContent) {
+        const seedData = JSON.parse(bundledContent);
+        try {
+          saveData(safeName, seedData);
+        } catch (e) {}
+        return seedData;
+      }
     }
   } catch (e) {
     console.error(`Error loading ${filename}:`, e);
