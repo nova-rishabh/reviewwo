@@ -27,3 +27,8 @@ thumbs.db
 # Typescript / Turbopack
 *.tsbuildinfo
 next-env.d.ts
+
+# Reference packages
+/wa_ref
+*.zip
+
