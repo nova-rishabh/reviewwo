@@ -78,7 +78,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/standees"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-sm font-display font-bold text-[#0B3D3B] bg-white hover:bg-[#E6FFFB] border border-[#0B3D3B]/20 rounded-xl shadow-sm transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-sm font-display font-bold text-[#0B3D3B] bg-white hover:bg-[#E6FFFB] hover:text-[#0B3D3B] border border-[#0B3D3B]/20 rounded-xl shadow-sm transition-all"
                 >
                   Explore Hardware Studio 🏷️
                 </Link>

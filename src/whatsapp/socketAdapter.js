@@ -2,12 +2,13 @@ import EventEmitter from 'events';
 import fs from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
+import { dataDir } from '../lib/store.js';
 
 class WhatsAppSocketAdapter extends EventEmitter {
   constructor() {
     super();
-    this.sessionFile = path.resolve('data/whatsapp_session.json');
-    this.logsFile = path.resolve('data/whatsapp_logs.json');
+    this.sessionFile = path.join(dataDir, 'whatsapp_session.json');
+    this.logsFile = path.join(dataDir, 'whatsapp_logs.json');
     this.status = 'DISCONNECTED'; // 'DISCONNECTED' | 'QR_READY' | 'CONNECTING' | 'CONNECTED'
     this.phoneNumber = '';
     this.qrCode = null; // { raw: string, dataUrl: string }

@@ -111,7 +111,7 @@ export default function AgencyPage() {
             <div>
               <Link
                 href="/register?plan=agency"
-                className="inline-flex items-center px-8 py-3.5 bg-white text-[#0B3D3B] text-xs font-display font-black rounded-xl shadow-lg hover:bg-[#E6FFFB] transition-all"
+                className="inline-flex items-center px-8 py-3.5 bg-white text-[#0B3D3B] text-xs font-display font-black rounded-xl shadow-lg hover:bg-[#E6FFFB] hover:text-[#0B3D3B] transition-all"
               >
                 Register as Agency Partner →
               </Link>

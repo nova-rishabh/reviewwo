@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { loadData, signToken } from '../../../../src/lib/store.js';
+import bcrypt from 'bcryptjs';
+import { loadData, saveData, signToken } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
   try {
@@ -11,14 +12,27 @@ export async function POST(request) {
 
     const users = loadData('users.json', []);
     const cleanEmail = email.trim().toLowerCase();
-    const user = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+    const userIndex = users.findIndex(u => u.email && u.email.toLowerCase() === cleanEmail);
 
-    if (!user) {
+    if (userIndex === -1) {
       return NextResponse.json({ error: 'No account found with this email. Please register first.' }, { status: 401 });
     }
 
-    if (user.password && user.password !== password) {
+    const user = users[userIndex];
+    const isBcrypt = user.password && user.password.startsWith('$2');
+    const isValid = isBcrypt
+      ? bcrypt.compareSync(password, user.password)
+      : user.password === password;
+
+    if (!isValid) {
       return NextResponse.json({ error: 'Incorrect password. Please try again.' }, { status: 401 });
+    }
+
+    // Auto-upgrade legacy plaintext passwords to bcrypt hash
+    if (!isBcrypt && user.password) {
+      user.password = bcrypt.hashSync(password, 10);
+      users[userIndex] = user;
+      saveData('users.json', users);
     }
 
     const token = signToken({

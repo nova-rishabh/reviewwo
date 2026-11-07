@@ -229,13 +229,53 @@ button {
 }
 
 a {
-  color: var(--color-accent);
+  color: inherit;
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
-a:hover {
+a:not([class*="btn"]):not([class*="bg-"]):not([class*="rounded-"]):hover {
   color: var(--color-accent);
+}
+
+/* ----------------------------------------------------------
+   UNIVERSAL HIGH-CONTRAST BUTTON HOVER SYSTEM
+   Guarantees button text is NEVER washed out or invisible on hover
+   ---------------------------------------------------------- */
+a.btn, button.btn,
+a[class*="rounded-xl"], button[class*="rounded-xl"],
+a[class*="rounded-2xl"], button[class*="rounded-2xl"] {
+  text-decoration: none !important;
+}
+
+/* Primary Dark Buttons (#0B3D3B) & Teal Buttons (#14B8A6) */
+a[class*="bg-[#0B3D3B]"]:hover,
+button[class*="bg-[#0B3D3B]"]:hover,
+a[class*="hover:bg-[#14B8A6]"]:hover,
+button[class*="hover:bg-[#14B8A6]"]:hover,
+[class*="hover:bg-[#14B8A6]"]:hover {
+  color: #FFFFFF !important;
+}
+
+/* Light Background Hover: Force Dark Text (#0B3D3B) for High Contrast */
+a[class*="hover:bg-[#E6FFFB]"]:hover,
+button[class*="hover:bg-[#E6FFFB]"]:hover,
+[class*="hover:bg-[#E6FFFB]"]:hover,
+a[class*="hover:bg-[#99F6E4]"]:hover,
+button[class*="hover:bg-[#99F6E4]"]:hover,
+[class*="hover:bg-[#99F6E4]"]:hover,
+a[class*="hover:bg-white"]:hover,
+button[class*="hover:bg-white"]:hover,
+[class*="hover:bg-white"]:hover {
+  color: #0B3D3B !important;
+}
+
+/* Ensure outline & secondary buttons invert cleanly to dark background with white text */
+.btn-secondary:hover,
+.btn-outline:hover {
+  background-color: #0B3D3B !important;
+  border-color: #0B3D3B !important;
+  color: #FFFFFF !important;
 }
 
 ul,
@@ -3734,7 +3774,8 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 
 .btn-outline:hover {
   background: var(--color-surface);
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
+  color: var(--color-primary) !important;
 }
 
 /* Table styles */

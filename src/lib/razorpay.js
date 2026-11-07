@@ -17,14 +17,20 @@ export function getRazorpayClient() {
 
 export function verifyPaymentSignature({ orderId, paymentId, signature }) {
   const secret = process.env.RAZORPAY_KEY_SECRET;
-  if (!secret) return false;
+  if (!secret || !signature || !orderId || !paymentId) return false;
 
   const generatedSignature = crypto
     .createHmac('sha256', secret)
     .update(`${orderId}|${paymentId}`)
     .digest('hex');
 
-  return generatedSignature === signature;
+  try {
+    const a = Buffer.from(generatedSignature, 'utf8');
+    const b = Buffer.from(signature, 'utf8');
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch (e) {
+    return false;
+  }
 }
 
 export const PLAN_PRICING = {

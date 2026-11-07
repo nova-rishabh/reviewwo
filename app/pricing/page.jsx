@@ -174,8 +174,8 @@ export default function PricingPage() {
                         billingCycle={billingCycle}
                         className={`w-full py-3.5 px-4 rounded-xl text-xs font-display font-bold text-center block shadow transition-all ${
                           p.popular
-                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white'
-                            : 'bg-[#E6FFFB] hover:bg-[#14B8A6] hover:text-white text-[#0B3D3B] border border-[#14B8A6]/30'
+                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white hover:text-white'
+                            : 'bg-[#E6FFFB] hover:bg-[#0B3D3B] text-[#0B3D3B] hover:text-white border border-[#14B8A6]/30'
                         }`}
                       >
                         Subscribe with Razorpay →
@@ -185,8 +185,8 @@ export default function PricingPage() {
                         href={`/register?plan=${p.id}&billing=${billingCycle}`}
                         className={`w-full py-3.5 px-4 rounded-xl text-xs font-display font-bold text-center block shadow transition-all ${
                           p.popular
-                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white'
-                            : 'bg-[#E6FFFB] hover:bg-[#14B8A6] hover:text-white text-[#0B3D3B] border border-[#14B8A6]/30'
+                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white hover:text-white'
+                            : 'bg-[#E6FFFB] hover:bg-[#0B3D3B] text-[#0B3D3B] hover:text-white border border-[#14B8A6]/30'
                         }`}
                       >
                         {p.ctaText}

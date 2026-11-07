@@ -109,7 +109,7 @@ export default function FeaturesPage() {
               <div className="pt-4 flex flex-col sm:flex-row gap-3">
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0B3D3B] text-xs font-display font-black rounded-xl shadow hover:bg-[#E6FFFB] transition-all"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0B3D3B] text-xs font-display font-black rounded-xl shadow hover:bg-[#E6FFFB] hover:text-[#0B3D3B] transition-all"
                 >
                   Create Account Free →
                 </Link>

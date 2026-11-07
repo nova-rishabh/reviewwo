@@ -2,14 +2,23 @@ import fs from 'fs';
 import path from 'path';
 import { verifyToken, signToken } from '../auth/jwt.js';
 
-const dataDir = path.resolve(process.cwd(), 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+export const dataDir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+
+export function getDataFilePath(filename) {
+  const safeName = path.basename(filename);
+  const target = path.join(dataDir, safeName);
+  const parent = path.dirname(target);
+  try {
+    if (!fs.existsSync(parent)) {
+      fs.mkdirSync(parent, { recursive: true });
+    }
+  } catch (e) {}
+  return target;
 }
 
 export function loadData(filename, fallback = []) {
   try {
-    const fullPath = path.join(dataDir, filename);
+    const fullPath = getDataFilePath(filename);
     if (fs.existsSync(fullPath)) {
       return JSON.parse(fs.readFileSync(fullPath, 'utf8'));
     }
@@ -21,7 +30,7 @@ export function loadData(filename, fallback = []) {
 
 export function saveData(filename, data) {
   try {
-    const fullPath = path.join(dataDir, filename);
+    const fullPath = getDataFilePath(filename);
     fs.writeFileSync(fullPath, JSON.stringify(data, null, 2), 'utf8');
     return true;
   } catch (e) {

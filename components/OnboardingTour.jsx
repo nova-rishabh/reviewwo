@@ -190,7 +190,7 @@ export default function OnboardingTour({ isOpen, onClose }) {
                 <Link
                   href={step.actionHref}
                   target={step.external ? '_blank' : undefined}
-                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-[#E6FFFB] hover:bg-[#14B8A6] text-[#0B3D3B] hover:text-white text-xs font-display font-bold rounded-xl border border-[#14B8A6]/40 transition-all shadow-sm"
+                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-[#E6FFFB] hover:bg-[#0B3D3B] text-[#0B3D3B] hover:text-white text-xs font-display font-bold rounded-xl border border-[#14B8A6]/40 transition-all shadow-sm"
                 >
                   {step.actionLabel}
                 </Link>

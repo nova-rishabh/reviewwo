@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { loadData, saveData, signToken } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
@@ -10,6 +11,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Name, email, and password are required.' }, { status: 400 });
     }
 
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters long.' }, { status: 400 });
+    }
+
     const users = loadData('users.json', []);
     const cleanEmail = email.trim().toLowerCase();
 
@@ -19,12 +24,13 @@ export async function POST(request) {
 
     const planPrices = { starter: 149, growth: 299, agency: 799 };
     const targetPhone = mobile || phone || '';
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
     const newUser = {
       id: `usr_${Date.now()}`,
       name: name.trim(),
       email: cleanEmail,
-      password: password,
+      password: hashedPassword,
       mobile: targetPhone,
       businessName: businessName ? businessName.trim() : `${name}'s Business`,
       plan,
