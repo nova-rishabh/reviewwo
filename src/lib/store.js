@@ -3,6 +3,9 @@ import path from 'path';
 import { verifyToken, signToken } from '../auth/jwt.js';
 
 const dataDir = path.resolve(process.cwd(), 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
 export function loadData(filename, fallback = []) {
   try {
