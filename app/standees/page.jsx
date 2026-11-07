@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import QRCode from 'qrcode';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
@@ -7,7 +8,16 @@ export const metadata = {
   description: 'Premium laser-engraved acrylic standees with dual-tap NFC and high-contrast vector QR codes. Engineered to turn physical foot traffic into verified 5-star Google reviews in 1 tap.',
 };
 
-export default function StandeesPage() {
+export default async function StandeesPage() {
+  let demoQr = '';
+  try {
+    demoQr = await QRCode.toDataURL('https://reviewwo.divergit.com/r/RW101', {
+      width: 320,
+      margin: 1,
+      color: { dark: '#0B3D3B', light: '#FFFFFF' }
+    });
+  } catch (e) {}
+
   const hardwareOptions = [
     {
       name: '7" × 5" Frosted Glass Acrylic Standee',
@@ -96,11 +106,19 @@ export default function StandeesPage() {
                 <p className="text-[10px] text-[#4A706E] font-medium">Tap NFC or Scan Code</p>
               </div>
 
-              <div className="w-32 h-32 bg-white border-2 border-[#0B3D3B] p-2.5 rounded-2xl flex items-center justify-center shadow-inner">
-                <div className="w-full h-full bg-[#0B3D3B] rounded-xl flex flex-col items-center justify-center text-white text-[10px] font-display font-bold p-1 text-center">
-                  <span>VECTOR QR</span>
-                  <span className="text-[8px] text-[#99F6E4] mt-1">RW-PRO</span>
-                </div>
+              <div className="w-32 h-32 bg-white border-2 border-[#0B3D3B] p-2 rounded-2xl flex items-center justify-center shadow-inner">
+                {demoQr ? (
+                  <img
+                    src={demoQr}
+                    alt="Reviewwo Live Standee QR Code"
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#0B3D3B] rounded-xl flex flex-col items-center justify-center text-white text-[10px] font-display font-bold p-1 text-center">
+                    <span>VECTOR QR</span>
+                    <span className="text-[8px] text-[#99F6E4] mt-1">RW-PRO</span>
+                  </div>
+                )}
               </div>
 
               <div className="text-center">

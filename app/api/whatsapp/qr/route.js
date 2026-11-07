@@ -10,7 +10,12 @@ export async function GET(request) {
 
   try {
     const qrData = await waSocket.generatePairingQr();
-    return NextResponse.json(qrData);
+    return NextResponse.json({
+      success: true,
+      raw: qrData.raw,
+      dataUrl: qrData.dataUrl,
+      qrDataUrl: qrData.dataUrl
+    });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import QRCode from 'qrcode';
 import { loadData, saveData, authenticateRequest } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
@@ -15,6 +16,20 @@ export async function POST(request) {
 
     const standees = loadData('standees.json', []);
     const shortCode = 'RW' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const fullUrl = `https://reviewwo.divergit.com/r/${shortCode}`;
+
+    const qrDataUrl = await QRCode.toDataURL(fullUrl, {
+      width: 400,
+      margin: 1,
+      color: { dark: '#0B3D3B', light: '#FFFFFF' }
+    });
+
+    const qrSvg = await QRCode.toString(fullUrl, {
+      type: 'svg',
+      margin: 1,
+      color: { dark: '#0B3D3B', light: '#FFFFFF' }
+    });
+
     const newStandee = {
       id: `std_${Date.now()}`,
       userId: user.id,
@@ -23,6 +38,9 @@ export async function POST(request) {
       format,
       shortCode,
       qrUrl: `/r/${shortCode}`,
+      fullUrl,
+      qrDataUrl,
+      qrSvg,
       scans: 0,
       fiveStarReviewsGenerated: 0,
       createdAt: new Date().toISOString()

@@ -40,7 +40,7 @@ export default function StandeesPage() {
       if (data.success) {
         setName('');
         setTableNumber('');
-        fetchStandees();
+        await fetchStandees();
         setSelectedStandee(data.standee);
       }
     } catch (err) {
@@ -48,6 +48,32 @@ export default function StandeesPage() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleDownloadPng = () => {
+    if (!selectedStandee?.qrDataUrl) return;
+    const a = document.createElement('a');
+    a.href = selectedStandee.qrDataUrl;
+    a.download = `reviewwo-${selectedStandee.shortCode || 'standee'}-qr.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleDownloadSvg = () => {
+    if (!selectedStandee?.qrSvg) {
+      handleDownloadPng();
+      return;
+    }
+    const blob = new Blob([selectedStandee.qrSvg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reviewwo-${selectedStandee.shortCode || 'standee'}-vector.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -136,19 +162,28 @@ export default function StandeesPage() {
                 <p><strong>Scans Captured:</strong> {selectedStandee?.scans || 0} customer taps</p>
               </div>
 
-              <div className="pt-2 flex gap-3">
+              <div className="pt-2 flex flex-wrap gap-2.5">
                 <button
                   type="button"
-                  onClick={() => alert('Vector SVG print template exported successfully!')}
-                  className="px-4 py-2 bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl hover:bg-[#0B3D3B] transition-all shadow"
+                  onClick={handleDownloadPng}
+                  disabled={!selectedStandee?.qrDataUrl}
+                  className="px-4 py-2 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow flex items-center gap-1.5"
                 >
-                  Download SVG Template
+                  <span>📥</span> Download QR (PNG)
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadSvg}
+                  disabled={!selectedStandee}
+                  className="px-4 py-2 bg-[#14B8A6] hover:bg-[#0B3D3B] text-white text-xs font-display font-bold rounded-xl transition-all shadow flex items-center gap-1.5"
+                >
+                  <span>📐</span> Download Vector SVG
                 </button>
               </div>
             </div>
 
             {/* Visualizer Mock */}
-            <div className="w-56 h-76 rounded-2xl bg-gradient-to-b from-[#F8FFFE] to-[#E6FFFB] border-4 border-[#0B3D3B] p-4 flex flex-col items-center justify-between shadow-2xl relative">
+            <div className="w-56 h-80 rounded-2xl bg-gradient-to-b from-[#F8FFFE] to-[#E6FFFB] border-4 border-[#0B3D3B] p-4 flex flex-col items-center justify-between shadow-2xl relative">
               <div className="text-center flex flex-col items-center">
                 <img
                   src="/assets/img/logos/combo-dark.png"
@@ -159,11 +194,19 @@ export default function StandeesPage() {
               </div>
 
               {/* QR Matrix Representation */}
-              <div className="w-28 h-28 bg-white border-2 border-[#0B3D3B] p-2 rounded-2xl flex items-center justify-center shadow-inner">
-                <div className="w-full h-full bg-[#0B3D3B] rounded-xl flex flex-col items-center justify-center text-white text-[10px] font-bold p-1 text-center">
-                  <span>VECTOR QR</span>
-                  <span className="text-[8px] text-[#99F6E4] mt-1">{selectedStandee?.shortCode || 'RW101'}</span>
-                </div>
+              <div className="w-32 h-32 bg-white border-2 border-[#0B3D3B] p-2 rounded-2xl flex items-center justify-center shadow-inner">
+                {selectedStandee?.qrDataUrl ? (
+                  <img
+                    src={selectedStandee.qrDataUrl}
+                    alt={`QR Code for ${selectedStandee.name}`}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#0B3D3B] rounded-xl flex flex-col items-center justify-center text-white text-[10px] font-bold p-1 text-center">
+                    <span>VECTOR QR</span>
+                    <span className="text-[8px] text-[#99F6E4] mt-1">{selectedStandee?.shortCode || 'RW101'}</span>
+                  </div>
+                )}
               </div>
 
               <div className="text-center">
@@ -203,9 +246,20 @@ export default function StandeesPage() {
                     <tr
                       key={std.id}
                       onClick={() => setSelectedStandee(std)}
-                      className={`cursor-pointer hover:bg-[#F8FFFE] ${selectedStandee?.id === std.id ? 'bg-[#E6FFFB]/50' : ''}`}
+                      className={`cursor-pointer hover:bg-[#F8FFFE] transition-colors ${selectedStandee?.id === std.id ? 'bg-[#E6FFFB]/50' : ''}`}
                     >
-                      <td className="py-3 px-3 font-bold text-[#0B3D3B]">{std.name}</td>
+                      <td className="py-3 px-3 font-bold text-[#0B3D3B] flex items-center gap-2.5">
+                        {std.qrDataUrl ? (
+                          <img
+                            src={std.qrDataUrl}
+                            alt="QR thumbnail"
+                            className="w-7 h-7 rounded border border-[#0B3D3B]/20 bg-white p-0.5 shrink-0"
+                          />
+                        ) : (
+                          <span className="w-7 h-7 rounded bg-[#0B3D3B] text-[8px] text-white flex items-center justify-center font-bold shrink-0">QR</span>
+                        )}
+                        <span>{std.name}</span>
+                      </td>
                       <td className="py-3 px-3 text-[#4A706E]">{std.tableNumber || '—'}</td>
                       <td className="py-3 px-3 text-[#234745] capitalize">{std.format?.replace('_', ' ') || 'Acrylic 7x5'}</td>
                       <td className="py-3 px-3">

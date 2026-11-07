@@ -18,6 +18,11 @@ export default function WhatsAppGatewayPage() {
       const res = await fetch('/api/whatsapp/status');
       const data = await res.json();
       setStatus(data);
+      if (data.connected) {
+        setQrCodeData(null);
+      } else if (data.qrDataUrl || data.dataUrl) {
+        setQrCodeData(prev => prev || data.qrDataUrl || data.dataUrl);
+      }
 
       const logsRes = await fetch('/api/whatsapp/logs');
       const logsData = await logsRes.json();
@@ -38,10 +43,35 @@ export default function WhatsAppGatewayPage() {
     try {
       const res = await fetch('/api/whatsapp/qr');
       const data = await res.json();
-      setQrCodeData(data.qrDataUrl);
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to generate QR code');
+      }
+      const qrImage = data.qrDataUrl || data.dataUrl || data.qr;
+      if (qrImage) {
+        setQrCodeData(qrImage);
+      }
       refreshStatus();
     } catch (e) {
       alert('Error generating pairing QR: ' + e.message);
+    } finally {
+      setLoadingQr(false);
+    }
+  };
+
+  // Simulate instant device pairing
+  const handleSimulatePair = async () => {
+    setLoadingQr(true);
+    try {
+      const res = await fetch('/api/whatsapp/pair', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setQrCodeData(null);
+        refreshStatus();
+      } else {
+        alert('Pairing error: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Pairing error: ' + e.message);
     } finally {
       setLoadingQr(false);
     }
@@ -158,11 +188,19 @@ export default function WhatsAppGatewayPage() {
                 <div className="space-y-4 text-center py-4">
                   <div className="max-w-xs mx-auto border border-[#0B3D3B]/10 rounded-2xl p-4 bg-[#F8FFFE] flex flex-col items-center justify-center min-h-[220px]">
                     {qrCodeData ? (
-                      <img
-                        src={qrCodeData}
-                        alt="WhatsApp Pairing QR Code"
-                        className="w-48 h-48 rounded-xl shadow-sm"
-                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="p-2 bg-white rounded-xl border-2 border-[#0B3D3B] shadow-inner">
+                          <img
+                            src={qrCodeData}
+                            alt="WhatsApp Pairing QR Code"
+                            className="w-48 h-48 rounded-lg"
+                          />
+                        </div>
+                        <span className="text-[10px] font-bold text-[#14B8A6] flex items-center gap-1 mt-1">
+                          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping"></span>
+                          Pairing Socket Ready • Awaiting Scan
+                        </span>
+                      </div>
                     ) : (
                       <div className="text-xs text-[#4A706E] space-y-2">
                         <div className="text-4xl text-[#14B8A6]">📱</div>
@@ -172,14 +210,26 @@ export default function WhatsAppGatewayPage() {
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleGenerateQr}
-                    disabled={loadingQr}
-                    className="inline-flex items-center justify-center px-6 py-2.5 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
-                  >
-                    {loadingQr ? 'Generating Socket...' : (qrCodeData ? 'Refresh QR Code' : 'Generate Pairing QR Code')}
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleGenerateQr}
+                      disabled={loadingQr}
+                      className="inline-flex items-center justify-center px-6 py-2.5 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
+                    >
+                      {loadingQr ? 'Generating Socket...' : (qrCodeData ? '🔄 Refresh QR Code' : '⚡ Generate Pairing QR Code')}
+                    </button>
+                    {qrCodeData && (
+                      <button
+                        type="button"
+                        onClick={handleSimulatePair}
+                        disabled={loadingQr}
+                        className="inline-flex items-center justify-center px-4 py-2.5 bg-[#10B981] hover:bg-[#0B3D3B] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
+                      >
+                        ✓ Simulate Scan (Link Device)
+                      </button>
+                    )}
+                  </div>
 
                   <div className="text-left text-xs text-[#4A706E] bg-[#E6FFFB] p-4 rounded-xl border border-[#14B8A6]/30 space-y-1">
                     <p className="font-bold text-[#0B3D3B]">Pairing Steps:</p>

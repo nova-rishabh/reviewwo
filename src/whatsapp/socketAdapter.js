@@ -71,7 +71,9 @@ class WhatsAppSocketAdapter extends EventEmitter {
       connected: this.status === 'CONNECTED',
       totalDispatches: this.dispatches.length,
       smsFeesSaved: `₹${this.dispatches.length * 2}`,
-      qrReady: this.status === 'QR_READY' && !!this.qrCode
+      qrReady: this.status === 'QR_READY' && !!this.qrCode,
+      qrDataUrl: this.qrCode ? this.qrCode.dataUrl : null,
+      dataUrl: this.qrCode ? this.qrCode.dataUrl : null
     };
   }
 
@@ -79,14 +81,19 @@ class WhatsAppSocketAdapter extends EventEmitter {
     this.status = 'QR_READY';
     const rawQr = `REVIEWWO_WA_PAIR_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     const dataUrl = await QRCode.toDataURL(rawQr, {
-      width: 300,
+      width: 320,
       margin: 2,
       color: { dark: '#0B3D3B', light: '#FFFFFF' }
     });
     this.qrCode = { raw: rawQr, dataUrl };
     this._saveSession();
     this.emit('qr', this.qrCode);
-    return this.qrCode;
+    return {
+      success: true,
+      raw: rawQr,
+      dataUrl,
+      qrDataUrl: dataUrl
+    };
   }
 
   async pairSimulate(phone = '+919876543210') {
