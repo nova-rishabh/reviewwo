@@ -1,22 +1,16 @@
 import { NextResponse } from 'next/server';
-import { authenticateRequest } from '../../../../src/lib/store.js';
+import { currentAdmin, normalizeMobile } from '../../../../src/lib/store.js';
 import { waSocket } from '../../../../src/whatsapp/socketAdapter.js';
 
 export async function POST(request) {
-  const user = authenticateRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  if (!currentAdmin(request)) return NextResponse.json({ error: 'Admins only.' }, { status: 403 });
   try {
     const { mobile } = await request.json();
-    if (!mobile) {
-      return NextResponse.json({ error: 'Mobile number is required.' }, { status: 400 });
-    }
-
-    const res = await waSocket.requestPairingCode(mobile);
+    const clean = normalizeMobile(mobile);
+    if (!clean) return NextResponse.json({ error: 'Enter a valid WhatsApp number.' }, { status: 400 });
+    const res = await waSocket.requestPairingCode(clean);
     return NextResponse.json(res);
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message || 'Could not get a pairing code.' }, { status: 500 });
   }
 }

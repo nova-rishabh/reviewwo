@@ -49,7 +49,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
       if (fs.existsSync(this.sessionFile)) {
         const raw = fs.readFileSync(this.sessionFile, 'utf8');
         const data = JSON.parse(raw);
-        this.status = data.status || 'DISCONNECTED';
+        // A saved "CONNECTED" status is not trusted: the socket must reconnect first.
+        this.status = 'DISCONNECTED';
         this.phoneNumber = data.phoneNumber || '';
       }
     } catch (e) {
@@ -62,12 +63,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
       const data = {
         status: this.status,
         phoneNumber: this.phoneNumber,
-        deviceName: "Reviewwo WhatsApp Gateway (Sovereign Socket)",
-        connectedAt: new Date().toISOString(),
-        batteryLevel: 100,
-        totalDispatches: this.dispatches.length,
-        smsFeesSaved: `₹${this.dispatches.length * 2}`,
-        mode: "sovereign_socket"
+        updatedAt: new Date().toISOString(),
+        totalDispatches: this.dispatches.length
       };
       fs.writeFileSync(this.sessionFile, JSON.stringify(data, null, 2), 'utf8');
     } catch (e) {}
@@ -93,10 +90,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
     return {
       status: this.status,
       phoneNumber: this.phoneNumber,
-      deviceName: "Reviewwo WhatsApp Gateway (Sovereign Socket)",
       connected: this.status === 'CONNECTED',
       totalDispatches: this.dispatches.length,
-      smsFeesSaved: `₹${this.dispatches.length * 2}`,
       qrReady: this.status === 'QR_READY' && !!this.qrCode,
       qrDataUrl: this.qrCode ? this.qrCode.dataUrl : null,
       dataUrl: this.qrCode ? this.qrCode.dataUrl : null
@@ -123,7 +118,7 @@ class WhatsAppSocketAdapter extends EventEmitter {
         auth: state,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: false,
-        browser: ['Reviewwo Engine', 'Chrome', '124.0.0'],
+        browser: ['Reviewwo', 'Chrome', '124.0.0'],
         syncFullHistory: false,
         generateHighQualityLinkPreview: false,
         connectTimeoutMs: 30000,
@@ -157,7 +152,7 @@ class WhatsAppSocketAdapter extends EventEmitter {
           this.status = 'CONNECTED';
           const rawId = sock.user?.id || '';
           const phoneOnly = rawId.split(':')[0].split('@')[0];
-          this.phoneNumber = phoneOnly ? `+${phoneOnly}` : '+91-Linked-Manager';
+          this.phoneNumber = phoneOnly ? `+${phoneOnly}` : '';
           this.qrCode = null;
           this._saveSession();
           this.emit('connected', { phoneNumber: this.phoneNumber });
@@ -287,19 +282,6 @@ class WhatsAppSocketAdapter extends EventEmitter {
     };
   }
 
-  async pairSimulate(phone = '+919876543210') {
-    this.status = 'CONNECTING';
-    this.emit('status', this.status);
-    await new Promise(r => setTimeout(r, 600));
-
-    this.status = 'CONNECTED';
-    this.phoneNumber = phone;
-    this.qrCode = null;
-    this._saveSession();
-    this.emit('connected', { phoneNumber: this.phoneNumber });
-    return this.getStatus();
-  }
-
   async disconnect() {
     try {
       if (this.sock) {
@@ -342,9 +324,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
       to: `+${standardMobile}`,
       type: messageType,
       text,
-      status: delivered ? 'delivered' : (this.status === 'CONNECTED' ? 'failed' : 'queued'),
-      timestamp: new Date().toISOString(),
-      cost: '₹0.00'
+      status: delivered ? 'delivered' : (this.status === 'CONNECTED' ? 'failed' : 'not_connected'),
+      timestamp: new Date().toISOString()
     };
 
     this.dispatches.unshift(logEntry);
@@ -356,7 +337,6 @@ class WhatsAppSocketAdapter extends EventEmitter {
       delivered,
       logId: logEntry.id,
       recipient: logEntry.to,
-      cost: '₹0.00 (Zero SMS Fees)',
       status: logEntry.status
     };
   }
@@ -366,4 +346,5 @@ class WhatsAppSocketAdapter extends EventEmitter {
   }
 }
 
-export const waSocket = new WhatsAppSocketAdapter();
+// One socket per server process, shared by every route bundle.
+export const waSocket = globalThis.__rwWaSocket || (globalThis.__rwWaSocket = new WhatsAppSocketAdapter());

@@ -87,3 +87,99 @@ export function authenticateRequest(request) {
 }
 
 export { verifyToken, signToken };
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Public base URL used in card links and QR codes. APP_URL is read at runtime;
+ * NEXT_PUBLIC_APP_URL is baked in at build time, so it is only a fallback.
+ * Printed cards depend on this value: changing it breaks cards already printed.
+ */
+export function appUrl() {
+  return (process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://reviewwo.divergit.com').replace(/\/$/, '');
+}
+
+/** Normalise a mobile number to +<country><number>; bare 10-digit numbers are treated as Indian. Returns '' if invalid. */
+export function normalizeMobile(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  let digits = raw.replace(/\D/g, '');
+  if (raw.startsWith('+')) {
+    return digits.length >= 10 && digits.length <= 15 ? `+${digits}` : '';
+  }
+  if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+  return /^[6-9]\d{9}$/.test(digits) ? `+91${digits}` : '';
+}
+
+/** Admins are listed by email in the ADMIN_EMAILS env var (comma separated). */
+export function isAdminEmail(email) {
+  const list = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return Boolean(email) && list.includes(String(email).toLowerCase());
+}
+
+/** Fields that are safe to send to the browser. */
+export function publicUser(u) {
+  if (!u) return null;
+  return {
+    id: u.id,
+    name: u.name || '',
+    email: u.email || '',
+    mobile: u.mobile || '',
+    businessName: u.businessName || '',
+    category: u.category || '',
+    city: u.city || '',
+    googlePlaceId: u.googlePlaceId || '',
+    alertName: u.alertName || '',
+    alertMobile: u.alertMobile || '',
+    plan: u.plan || 'starter',
+    planStatus: u.planStatus || 'unpaid',
+    billingCycle: u.billingCycle || 'monthly',
+    // Accounts created before onboarding existed count as onboarded if they have a Google listing.
+    onboardingComplete: u.onboardingComplete === true || (u.onboardingComplete === undefined && Boolean(u.googlePlaceId)),
+    isAdmin: isAdminEmail(u.email),
+  };
+}
+
+/** Returns the signed-in user's stored record, or null. */
+export function currentUserRecord(request) {
+  const decoded = authenticateRequest(request);
+  if (!decoded) return null;
+  const users = loadData('users.json', []);
+  return users.find((u) => u.id === decoded.id) || null;
+}
+
+export const AUTH_COOKIE = 'rw_auth_token';
+
+export function setAuthCookie(response, token) {
+  response.cookies.set(AUTH_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60,
+  });
+  return response;
+}
+
+export function tokenFor(user) {
+  return signToken({ id: user.id, email: user.email });
+}
+
+/** Google Place IDs are URL-safe strings, usually starting with "ChIJ". */
+export function isValidPlaceId(value) {
+  return /^[A-Za-z0-9_-]{20,300}$/.test(String(value || ''));
+}
+
+export const PLAN_IDS = ['starter', 'growth', 'agency'];
+
+/** Returns the signed-in admin's record, or null when the caller is not an admin. */
+export function currentAdmin(request) {
+  const user = currentUserRecord(request);
+  return user && isAdminEmail(user.email) ? user : null;
+}

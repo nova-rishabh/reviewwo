@@ -1,17 +1,1 @@
-[
-  {
-    "id": "usr_divergit_admin",
-    "name": "Divergit Admin",
-    "businessName": "Divergit",
-    "mobile": "+919876543210",
-    "email": "admin@divergit.com",
-    "password": "$2b$10$9lZrHIEKruiGeSUstPdPROJYtJvUO1LNeimtdVWdjrEsNnbqpO7ta",
-    "plan": "agency",
-    "planPrice": 799,
-    "createdAt": "2026-11-01T00:00:00.000Z",
-    "role": "admin",
-    "googlePlaceId": "",
-    "googleRating": 5,
-    "reviewCount": 0
-  }
-]
+[]

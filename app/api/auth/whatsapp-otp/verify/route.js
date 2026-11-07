@@ -1,76 +1,45 @@
 import { NextResponse } from 'next/server';
-import { otpStore, loadData, saveData, signToken } from '../../../../../src/lib/store.js';
+import {
+  otpStore,
+  loadData,
+  normalizeMobile,
+  publicUser,
+  setAuthCookie,
+  tokenFor,
+} from '../../../../../src/lib/store.js';
+
+const INVALID = 'That code is wrong or has expired. Ask for a new one.';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const rawMobile = body.mobile || body.phone || '';
-    const otp = body.otp || body.code || '';
-    const cleanMobile = rawMobile.replace(/[^0-9]/g, '');
-    const record = otpStore.get(cleanMobile);
+    const mobile = normalizeMobile(body.mobile || body.phone);
+    const otp = String(body.otp || body.code || '').trim();
+    const record = mobile ? otpStore.get(mobile) : null;
 
-    if (!record || Date.now() >= record.expiresAt) {
-      return NextResponse.json({ error: 'Security code is invalid or expired. Please request a new code.' }, { status: 400 });
+    if (!record?.otp || Date.now() >= record.expiresAt) {
+      return NextResponse.json({ error: INVALID }, { status: 400 });
     }
 
     record.attempts = (record.attempts || 0) + 1;
     if (record.attempts > 5) {
-      otpStore.delete(cleanMobile);
-      return NextResponse.json({ error: 'Too many incorrect attempts. This code has been invalidated for security. Please request a new code.' }, { status: 429 });
+      otpStore.delete(mobile);
+      return NextResponse.json({ error: 'Too many wrong attempts. Ask for a new code.' }, { status: 429 });
     }
-
     if (record.otp !== otp) {
-      return NextResponse.json({ error: `Incorrect security code. ${5 - record.attempts} attempts remaining.` }, { status: 400 });
+      return NextResponse.json({ error: INVALID }, { status: 400 });
     }
 
-    otpStore.delete(cleanMobile);
+    otpStore.delete(mobile);
     const users = loadData('users.json', []);
-    let user = users.find(u => u.mobile && u.mobile.replace(/[^0-9]/g, '') === cleanMobile);
-
+    const user = users.find((u) => u.mobile && normalizeMobile(u.mobile) === mobile);
     if (!user) {
-      user = {
-        id: `usr_${Date.now()}`,
-        name: 'WhatsApp Merchant',
-        email: `wa_${cleanMobile}@reviewwo.divergit.com`,
-        mobile: rawMobile,
-        businessName: 'My Local Business',
-        plan: 'growth',
-        planPrice: 299,
-        createdAt: new Date().toISOString(),
-        role: 'merchant',
-        googlePlaceId: '',
-        googleRating: 5.0,
-        reviewCount: 0
-      };
-      users.push(user);
-      saveData('users.json', users);
+      return NextResponse.json({ error: INVALID }, { status: 400 });
     }
 
-    const token = signToken({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      businessName: user.businessName,
-      role: 'merchant',
-      plan: user.plan
-    });
-
-    const response = NextResponse.json({
-      success: true,
-      token,
-      user
-    });
-
-    response.cookies.set('rw_auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60
-    });
-
-    return response;
+    const response = NextResponse.json({ success: true, user: publicUser(user) });
+    return setAuthCookie(response, tokenFor(user));
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Sign-in failed. Please try again.' }, { status: 500 });
   }
 }

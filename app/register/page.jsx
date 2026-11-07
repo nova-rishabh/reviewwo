@@ -1,201 +1,188 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import AuthShell from '../../components/AuthShell';
 
-export default function RegisterPage() {
+const PLANS = [
+  { id: 'starter', name: 'Starter', price: 149 },
+  { id: 'growth', name: 'Growth', price: 299 },
+  { id: 'agency', name: 'Agency', price: 799 },
+];
+
+function RegisterForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const initialPlan = PLANS.some((p) => p.id === params.get('plan')) ? params.get('plan') : 'starter';
+  const billingCycle = params.get('billing') === 'annual' ? 'annual' : 'monthly';
 
-  const [name, setName] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [password, setPassword] = useState('');
-  const [plan, setPlan] = useState('growth');
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '', plan: initialPlan });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleRegister = async (e) => {
+  useEffect(() => {
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.authenticated) router.replace(d.user.onboardingComplete ? '/dashboard' : '/onboarding');
+      })
+      .catch(() => {});
+  }, [router]);
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (form.password.length < 8) {
+      setError('Use at least 8 characters for your password.');
+      return;
+    }
     setLoading(true);
-
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          businessName,
-          email,
-          mobile,
-          password,
-          plan
-        })
+        body: JSON.stringify({ ...form, billingCycle }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Registration failed.');
-      }
-      router.push('/dashboard');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not create your account.');
+      router.replace('/onboarding');
       router.refresh();
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FFFE] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      {/* Brand Header */}
-      <div className="w-full max-w-md text-center flex flex-col items-center">
-        <Link href="/" className="inline-block group mb-4">
-          <img
-            src="/assets/img/logos/combo-dark.png"
-            alt="Reviewwo"
-            className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
-          />
-        </Link>
-        <h2 className="text-2xl font-display font-black tracking-tight text-[#0B3D3B]">
-          Create Enterprise Account
-        </h2>
-        <p className="mt-1 text-xs text-[#4A706E]">
-          Join thousands of merchants accelerating 5-star Google reviews with 1-tap deep links.
-        </p>
-      </div>
-
-      <div className="mt-8 w-full max-w-xl">
-        <div className="bg-white py-8 px-6 shadow-xl border border-[#0B3D3B]/10 rounded-3xl sm:px-10">
-          {error && (
-            <div className="mb-6 p-3.5 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 text-xs font-bold text-[#EF4444]">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                  Your Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Vikram Sharma"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                  Business / Store Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Divergit, Blue Tokai, Apollo Clinic"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                  Work Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@business.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                  WhatsApp Number (for Grievance Alerts)
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="+91 98765 43210"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                Create Strong Password
-              </label>
-              <input
-                type="password"
-                required
-                placeholder="At least 8 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
-              />
-            </div>
-
-            {/* Plan Selector */}
-            <div>
-              <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-2">
-                Choose Subscription Plan
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { id: 'starter', name: 'Starter', price: '₹149/mo', desc: '1 Location' },
-                  { id: 'growth', name: 'Growth', price: '₹299/mo', desc: 'Popular • 3 Loc' },
-                  { id: 'agency', name: 'Agency', price: '₹799/mo', desc: 'White-Label' }
-                ].map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => setPlan(p.id)}
-                    className={`cursor-pointer p-3.5 rounded-2xl border text-center transition-all ${
-                      plan === p.id
-                        ? 'border-[#14B8A6] bg-[#E6FFFB] shadow-sm'
-                        : 'border-[#0B3D3B]/10 bg-[#F8FFFE] hover:border-[#14B8A6]/40'
-                    }`}
-                  >
-                    <p className="text-xs font-display font-extrabold text-[#0B3D3B]">{p.name}</p>
-                    <p className="text-sm font-display font-black text-[#14B8A6]">{p.price}</p>
-                    <p className="text-[10px] text-[#4A706E]">{p.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="h-12 w-full bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-sm font-display font-bold rounded-xl transition-all shadow-md mt-4 flex items-center justify-center gap-2"
-            >
-              {loading ? 'Creating Account...' : 'Complete Enterprise Registration →'}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-[#0B3D3B]/10 text-center">
-            <p className="text-xs text-[#4A706E]">
-              Already have an account?{' '}
-              <Link href="/login" className="font-bold text-[#14B8A6] hover:underline">
-                Sign in here
-              </Link>
-            </p>
-          </div>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate={false}>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{error}</span>
         </div>
+      )}
+
+      <div>
+        <label htmlFor="name" className="label">Your name</label>
+        <input id="name" required autoComplete="name" value={form.name} onChange={set('name')} className="input" />
       </div>
-    </div>
+
+      <div>
+        <label htmlFor="email" className="label">Email</label>
+        <input
+          id="email"
+          type="email"
+          required
+          autoComplete="email"
+          value={form.email}
+          onChange={set('email')}
+          placeholder="you@business.com"
+          className="input"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="mobile" className="label">Mobile number</label>
+        <div className="flex">
+          <span className="inline-flex h-11 items-center rounded-l-lg border border-r-0 border-line bg-canvas px-3 text-sm font-medium text-ink-muted">
+            +91
+          </span>
+          <input
+            id="mobile"
+            type="tel"
+            inputMode="numeric"
+            required
+            autoComplete="tel-national"
+            value={form.mobile}
+            onChange={set('mobile')}
+            placeholder="98765 43210"
+            className="input rounded-l-none"
+          />
+        </div>
+        <p className="hint">Use a number with WhatsApp. You can sign in with it, and we’ll suggest it for feedback alerts.</p>
+      </div>
+
+      <div>
+        <label htmlFor="password" className="label">Password</label>
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            value={form.password}
+            onChange={set('password')}
+            className="input pr-11"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-ink-subtle hover:bg-canvas hover:text-ink"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        <p className="hint">At least 8 characters.</p>
+      </div>
+
+      <fieldset>
+        <legend className="label">Plan</legend>
+        <div className="grid grid-cols-3 gap-2">
+          {PLANS.map((p) => (
+            <label
+              key={p.id}
+              className={`cursor-pointer rounded-lg border px-3 py-2.5 text-center transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-600 ${
+                form.plan === p.id ? 'border-brand-800 bg-brand-50' : 'border-line hover:border-brand-200'
+              }`}
+            >
+              <input
+                type="radio"
+                name="plan"
+                value={p.id}
+                checked={form.plan === p.id}
+                onChange={set('plan')}
+                className="sr-only"
+              />
+              <span className="block text-sm font-semibold text-ink">{p.name}</span>
+              <span className="block text-[13px] text-ink-muted">₹{p.price}/mo</span>
+            </label>
+          ))}
+        </div>
+        <p className="hint">You can change your plan later. You’ll pay when you subscribe from your dashboard.</p>
+      </fieldset>
+
+      <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
+        {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+        {loading ? 'Creating account…' : 'Create account'}
+      </button>
+    </form>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <AuthShell
+      title="Create your account"
+      subtitle="Next, you’ll add your business and Google listing."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link href="/login" className="link">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <Suspense fallback={<div className="h-96" />}>
+        <RegisterForm />
+      </Suspense>
+    </AuthShell>
   );
 }

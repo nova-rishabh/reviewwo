@@ -1,49 +1,51 @@
 import { NextResponse } from 'next/server';
-import { loadData } from '../../../../src/lib/store.js';
+import { loadData, saveData } from '../../../../src/lib/store.js';
 
+export const dynamic = 'force-dynamic';
+
+const DEMO = {
+  name: 'The Corner Café',
+  city: 'Bengaluru',
+  category: 'cafe',
+  placeId: '',
+  cardName: 'Demo card',
+};
+
+/**
+ * Public: looks up the business behind a card code for the customer review page.
+ * GET /api/standees/resolve?code=ABC123&scan=1   (scan=1 counts a visit)
+ */
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const code = (searchParams.get('code') || '').trim();
+  const code = (searchParams.get('code') || '').trim().toLowerCase();
+  const countScan = searchParams.get('scan') === '1';
 
-  const standees = loadData('standees.json', []);
+  if (!code) return NextResponse.json({ found: false }, { status: 404 });
+  if (code === 'demo') return NextResponse.json({ found: true, demo: true, business: DEMO });
+
+  const cards = loadData('standees.json', []);
+  const card = cards.find((c) => String(c.shortCode || '').toLowerCase() === code);
+  if (!card) return NextResponse.json({ found: false }, { status: 404 });
+
   const users = loadData('users.json', []);
+  const owner = users.find((u) => u.id === card.userId);
+  if (!owner) return NextResponse.json({ found: false }, { status: 404 });
 
-  // Try to find standee by code
-  let matchedStandee = null;
-  if (code) {
-    matchedStandee = standees.find(s => 
-      (s.shortCode && s.shortCode.toLowerCase() === code.toLowerCase()) ||
-      (s.id && s.id.toLowerCase() === code.toLowerCase()) ||
-      (s.qrSlug && s.qrSlug.toLowerCase() === code.toLowerCase())
-    );
+  if (countScan) {
+    card.scans = (card.scans || 0) + 1;
+    card.lastScanAt = new Date().toISOString();
+    saveData('standees.json', cards);
   }
-
-  // Find merchant
-  let merchant = null;
-  if (matchedStandee && matchedStandee.userId) {
-    merchant = users.find(u => u.id === matchedStandee.userId);
-  }
-  if (!merchant && users.length > 0) {
-    merchant = users[0];
-  }
-
-  const businessName = (matchedStandee && matchedStandee.name) || (merchant && merchant.businessName) || 'Reviewwo Partner Store';
-  const placeId = (merchant && merchant.googlePlaceId) || '';
-  const rating = (merchant && merchant.googleRating) || 5.0;
-  const totalReviews = (merchant && merchant.reviewCount) || 0;
-  const tableNumber = (matchedStandee && matchedStandee.tableNumber) || '';
 
   return NextResponse.json({
-    success: true,
-    code: code || 'DEMO',
-    standee: matchedStandee,
+    found: true,
+    demo: false,
     business: {
-      name: businessName,
-      placeId: placeId,
-      rating: rating,
-      totalReviews: totalReviews,
-      tableNumber: tableNumber,
-      hasPlaceId: Boolean(placeId)
-    }
+      name: owner.businessName || 'Our business',
+      city: owner.city || '',
+      category: owner.category || '',
+      placeId: owner.googlePlaceId || '',
+      cardName: card.name || '',
+    },
   });
 }

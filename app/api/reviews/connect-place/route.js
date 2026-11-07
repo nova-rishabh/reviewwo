@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { loadData, saveData, authenticateRequest } from '../../../../src/lib/store.js';
+import { loadData, saveData, authenticateRequest, isValidPlaceId } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
   const user = authenticateRequest(request);
@@ -9,8 +9,8 @@ export async function POST(request) {
 
   try {
     const { googlePlaceId, businessName } = await request.json();
-    if (!googlePlaceId) {
-      return NextResponse.json({ error: 'Google Place ID is required.' }, { status: 400 });
+    if (!isValidPlaceId(googlePlaceId)) {
+      return NextResponse.json({ error: 'Enter a valid Google Place ID.' }, { status: 400 });
     }
 
     const users = loadData('users.json', []);

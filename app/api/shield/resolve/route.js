@@ -1,28 +1,29 @@
 import { NextResponse } from 'next/server';
 import { loadData, saveData, authenticateRequest } from '../../../../src/lib/store.js';
 
+/** Mark a feedback message resolved ({ id, note }) or reopen it ({ id, reopen: true }). */
 export async function POST(request) {
-  const user = authenticateRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const session = authenticateRequest(request);
+  if (!session) return NextResponse.json({ error: 'Sign in again to continue.' }, { status: 401 });
 
   try {
-    const { logId, resolutionNote } = await request.json();
-    const logs = loadData('shield_logs.json', []);
-    const record = logs.find(l => l.id === logId);
+    const body = await request.json();
+    const id = body.id || body.logId;
+    const log = loadData('shield_logs.json', []);
+    const item = log.find((l) => l.id === id && l.userId === session.id);
+    if (!item) return NextResponse.json({ error: 'Message not found.' }, { status: 404 });
 
-    if (!record) {
-      return NextResponse.json({ error: 'Log entry not found' }, { status: 404 });
+    if (body.reopen === true) {
+      item.status = 'open';
+      item.resolvedAt = null;
+    } else {
+      item.status = 'resolved';
+      item.resolvedAt = new Date().toISOString();
+      item.note = String(body.note || '').trim().slice(0, 500);
     }
-
-    record.status = 'resolved';
-    record.resolvedAt = new Date().toISOString();
-    record.actionTaken = resolutionNote || 'Contacted customer via WhatsApp and resolved grievance.';
-
-    saveData('shield_logs.json', logs);
-    return NextResponse.json({ success: true, log: record });
+    saveData('shield_logs.json', log);
+    return NextResponse.json({ success: true });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Could not update the message.' }, { status: 500 });
   }
 }

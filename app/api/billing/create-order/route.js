@@ -1,61 +1,46 @@
 import { NextResponse } from 'next/server';
 import { getRazorpayClient, PLAN_PRICING } from '../../../../src/lib/razorpay.js';
-import { authenticateRequest } from '../../../../src/lib/store.js';
+import { currentUserRecord } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
-  try {
-    const user = authenticateRequest(request);
-    const body = await request.json();
-    const { plan = 'growth', billingCycle = 'monthly', email, name } = body;
+  const user = currentUserRecord(request);
+  if (!user) return NextResponse.json({ error: 'Sign in to subscribe.' }, { status: 401 });
 
-    const planConfig = PLAN_PRICING[plan] || PLAN_PRICING.growth;
-    const priceInINR = billingCycle === 'annual' ? planConfig.annualPrice : planConfig.monthlyPrice;
-    const amountInPaise = priceInINR * 100;
+  try {
+    const body = await request.json();
+    const planId = PLAN_PRICING[body.plan] ? body.plan : null;
+    if (!planId) return NextResponse.json({ error: 'Choose a plan.' }, { status: 400 });
+    const billingCycle = body.billingCycle === 'annual' ? 'annual' : 'monthly';
+    const plan = PLAN_PRICING[planId];
+    const amountInr = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
 
     const razorpay = getRazorpayClient();
-
-    // If Razorpay keys are not yet configured in env, provide clear response
     if (!razorpay) {
-      return NextResponse.json({
-        success: false,
-        isConfigured: false,
-        error: 'Razorpay keys not configured on server. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in your environment or Render dashboard.',
-        amount: priceInINR,
-        plan: planConfig.name,
-        requiresKeys: true
-      }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Online payments are not set up yet. Please contact us to subscribe.', requiresKeys: true },
+        { status: 503 }
+      );
     }
 
-    const orderOptions = {
-      amount: amountInPaise,
+    // Plan, cycle and user are stored on the order so verification never trusts the browser.
+    const order = await razorpay.orders.create({
+      amount: amountInr * 100,
       currency: 'INR',
-      receipt: `rw_sub_${Date.now()}`,
-      notes: {
-        plan: planConfig.name,
-        billingCycle,
-        userId: user ? user.id : 'guest',
-        userEmail: user ? user.email : (email || 'unregistered')
-      }
-    };
-
-    const order = await razorpay.orders.create(orderOptions);
+      receipt: `rw_${Date.now()}`,
+      notes: { planId, billingCycle, userId: user.id },
+    });
 
     return NextResponse.json({
       success: true,
-      isConfigured: true,
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
       keyId: process.env.RAZORPAY_KEY_ID,
-      plan: planConfig.name,
+      plan: plan.name,
       billingCycle,
-      prefill: {
-        name: user ? user.name : (name || ''),
-        email: user ? user.email : (email || ''),
-        contact: user ? user.mobile : ''
-      }
+      prefill: { name: user.name || '', email: user.email || '', contact: user.mobile || '' },
     });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Could not start the payment. Please try again.' }, { status: 500 });
   }
 }

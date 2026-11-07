@@ -1,126 +1,102 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
+import useSession from './useSession';
+
+const navLinks = [
+  { label: 'Features', href: '/features' },
+  { label: 'NFC cards', href: '/cards' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'For agencies', href: '/agency' },
+];
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { status } = useSession();
 
-  const navLinks = [
-    { label: 'Features', href: '/features' },
-    { label: 'Hardware Studio', href: '/standees' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'Agency Portal', href: '/agency' },
-  ];
+  useEffect(() => setOpen(false), [pathname]);
+
+  const authActions = (mobile) => {
+    if (status === 'loading') {
+      return <span className={mobile ? 'h-10' : 'h-10 w-40'} aria-hidden="true" />;
+    }
+    if (status === 'authenticated') {
+      return (
+        <Link href="/dashboard" className={`btn btn-primary ${mobile ? 'w-full' : ''}`}>
+          Go to dashboard
+        </Link>
+      );
+    }
+    return (
+      <>
+        <Link href="/login" className={`btn btn-ghost ${mobile ? 'w-full border border-line' : ''}`}>
+          Sign in
+        </Link>
+        <Link href="/register" className={`btn btn-primary ${mobile ? 'w-full' : ''}`}>
+          Get started
+        </Link>
+      </>
+    );
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F8FFFE]/95 backdrop-blur-md border-b border-[#0B3D3B]/10">
-      {/* Top Value Banner */}
-      <div className="bg-[#0B3D3B] text-[#C5EBE8] text-xs py-2 px-4 text-center font-medium">
-        <span>⚡ <strong className="text-white font-extrabold">Frictionless In-Store Reviews:</strong> 1-Tap Copy &amp; Google Deep-Link • Instant Manager Grievance Alerts • Starter from ₹149/mo.</span>
-        <Link href="/pricing" className="ml-2 underline text-[#99F6E4] hover:text-white font-bold transition-colors">
-          View Plans →
+    <header className="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-center" aria-label="Reviewwo home">
+          <img src="/assets/img/logos/combo-dark.png" alt="Reviewwo" className="h-8 w-auto" />
         </Link>
+
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+          {navLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  active ? 'text-brand-800 bg-brand-50' : 'text-ink-muted hover:bg-canvas hover:text-ink'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="hidden items-center gap-2 md:flex">{authActions(false)}</div>
+
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="btn btn-ghost -mr-2 h-10 w-10 px-0 md:hidden"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Brand Logo - Official Reviewwo Brand Identity */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <img
-              src="/assets/img/logos/combo-dark.png"
-              alt="Reviewwo"
-              className="h-9 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
-            />
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm font-semibold transition-colors ${
-                    isActive
-                      ? 'text-[#14B8A6] font-bold'
-                      : 'text-[#234745] hover:text-[#14B8A6]'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+      {open && (
+        <div className="border-t border-line bg-white px-4 pb-5 pt-2 md:hidden">
+          <nav className="flex flex-col" aria-label="Mobile">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-md px-3 py-3 text-[15px] font-medium ${
+                  pathname === link.href ? 'bg-brand-50 text-brand-800' : 'text-ink hover:bg-canvas'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
-
-          {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-sm font-semibold text-[#0B3D3B] hover:text-[#14B8A6] px-4 py-2 rounded-lg transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center text-sm font-display font-bold text-white bg-[#0B3D3B] hover:bg-[#14B8A6] px-5 py-2.5 rounded-xl shadow hover:shadow-md transition-all"
-            >
-              Get Started Free →
-            </Link>
-          </div>
-
-          {/* Mobile hamburger button */}
-          <div className="flex md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-[#0B3D3B] hover:text-[#14B8A6] p-2 focus:outline-none"
-              aria-label="Toggle Navigation Menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-[#0B3D3B]/10 px-4 pt-2 pb-6 space-y-3">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-semibold text-[#234745] hover:text-[#14B8A6] py-2"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="pt-4 border-t border-[#0B3D3B]/10 flex flex-col gap-3">
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-center font-semibold text-[#0B3D3B] py-2.5 rounded-lg border border-[#0B3D3B]/20"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-center font-display font-bold text-white bg-[#0B3D3B] py-2.5 rounded-xl shadow"
-            >
-              Get Started Free →
-            </Link>
-          </div>
+          <div className="mt-3 flex flex-col gap-2 border-t border-line pt-4">{authActions(true)}</div>
         </div>
       )}
     </header>

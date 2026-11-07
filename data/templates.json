@@ -1,5 +1,5 @@
 {
-  "otp": "Your Reviewwo security code is *{{otp}}*.\n\nEnter this code in your browser to sign in to your merchant console.\nValid for 5 minutes. Do not share with anyone.",
-  "grievance_alert": "⚠️ *Private Shield Alert — {{business_name}}*\n\n*Rating:* {{stars}} Stars\n*Table / Zone:* {{table_no}}\n*Guest Name:* {{customer_name}}\n*Guest Contact:* {{customer_phone}}\n*Feedback:* \"{{feedback}}\"\n\n👉 *Action Required:* Review grievance privately before guest leaves.",
-  "review_invite": "Hi {{customer_name}}! Thank you for visiting {{business_name}} today ✨\n\nCould you take 10 seconds to share your 5-star experience on Google? AI has pre-drafted your review:\n👉 {{review_link}}\n\nWe appreciate your support!"
+  "otp": "Your Reviewwo sign-in code is {{otp}}.\n\nIt expires in 5 minutes. Do not share it with anyone.",
+  "feedback_alert": "New feedback for {{business_name}}\n\nRating: {{stars}} of 5\nWhere: {{where}}\nFrom: {{customer_name}}\nContact: {{customer_contact}}\n\n\"{{feedback}}\"\n\nOpen your Reviewwo dashboard to mark it resolved.",
+  "test_alert": "This is a test message from Reviewwo for {{business_name}}.\n\nFeedback alerts from your NFC cards will arrive on this number."
 }

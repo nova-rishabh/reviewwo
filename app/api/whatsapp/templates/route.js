@@ -1,27 +1,18 @@
 import { NextResponse } from 'next/server';
-import { authenticateRequest } from '../../../../src/lib/store.js';
+import { currentAdmin } from '../../../../src/lib/store.js';
 import { waTransport } from '../../../../src/whatsapp/transport.js';
 
 export async function GET(request) {
-  const user = authenticateRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  if (!currentAdmin(request)) return NextResponse.json({ error: 'Admins only.' }, { status: 403 });
   return NextResponse.json(waTransport.getTemplates());
 }
 
 export async function PUT(request) {
-  const user = authenticateRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  if (!currentAdmin(request)) return NextResponse.json({ error: 'Admins only.' }, { status: 403 });
   try {
-    const body = await request.json();
-    const updated = waTransport.saveTemplates(body);
+    const updated = waTransport.saveTemplates(await request.json());
     return NextResponse.json({ success: true, templates: updated });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Could not save templates.' }, { status: 500 });
   }
 }

@@ -1,41 +1,43 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-import { otpStore } from '../../../../../src/lib/store.js';
+import { otpStore, loadData, normalizeMobile } from '../../../../../src/lib/store.js';
 import { waTransport } from '../../../../../src/whatsapp/transport.js';
+
+const COOLDOWN_MS = 60 * 1000;
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const mobile = body.mobile || body.phone;
+    const mobile = normalizeMobile(body.mobile || body.phone);
     if (!mobile) {
-      return NextResponse.json({ error: 'Phone number is required.' }, { status: 400 });
+      return NextResponse.json({ error: 'Enter a valid 10-digit mobile number.' }, { status: 400 });
     }
 
-    const cleanMobile = mobile.replace(/[^0-9]/g, '');
-
-    // Anti-abuse rate limiting: 60-second cooldown per mobile number
-    const existing = otpStore.get(cleanMobile);
-    if (existing && existing.lastRequested && Date.now() - existing.lastRequested < 60 * 1000) {
-      const waitSeconds = Math.ceil((60 * 1000 - (Date.now() - existing.lastRequested)) / 1000);
-      return NextResponse.json(
-        { error: `Please wait ${waitSeconds}s before requesting a new security code.` },
-        { status: 429 }
-      );
+    const existing = otpStore.get(mobile);
+    if (existing?.lastRequested && Date.now() - existing.lastRequested < COOLDOWN_MS) {
+      const wait = Math.ceil((COOLDOWN_MS - (Date.now() - existing.lastRequested)) / 1000);
+      return NextResponse.json({ error: `Wait ${wait} seconds before asking for another code.` }, { status: 429 });
     }
 
-    const rawOtp = String(Math.floor(100000 + Math.random() * 900000));
-    const expiresAt = Date.now() + 5 * 60 * 1000;
-    otpStore.set(cleanMobile, { otp: rawOtp, expiresAt, lastRequested: Date.now() });
+    const users = loadData('users.json', []);
+    const account = users.find((u) => u.mobile && normalizeMobile(u.mobile) === mobile);
 
-    const dispatch = await waTransport.sendOtp(mobile, rawOtp);
-    return NextResponse.json({
-      success: true,
-      message: 'OTP dispatched via sovereign WhatsApp socket.',
-      delivered: dispatch.delivered,
-      logId: dispatch.logId,
-      expiresInSeconds: 300,
-      cost: '₹0.00 (Zero SMS Fees)'
-    });
+    // Same response whether or not the number has an account, so numbers can't be probed.
+    otpStore.set(mobile, { lastRequested: Date.now() });
+    if (account) {
+      const otp = String(crypto.randomInt(100000, 1000000));
+      otpStore.set(mobile, { otp, expiresAt: Date.now() + 5 * 60 * 1000, lastRequested: Date.now(), attempts: 0 });
+      const result = await waTransport.sendOtp(mobile, otp);
+      if (!result?.delivered) {
+        return NextResponse.json(
+          { error: 'We couldn’t send a WhatsApp code right now. Sign in with your email and password instead.' },
+          { status: 503 }
+        );
+      }
+    }
+
+    return NextResponse.json({ success: true, expiresInSeconds: 300 });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Could not send a code. Please try again.' }, { status: 500 });
   }
 }

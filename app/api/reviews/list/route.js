@@ -7,7 +7,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const reviews = loadData('reviews.json', []);
+  const reviews = loadData('reviews.json', []).filter((r) => r.userId === user.id);
   const avg = reviews.length ? (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1) : 5.0;
 
   return NextResponse.json({

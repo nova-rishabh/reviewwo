@@ -1,359 +1,349 @@
 'use client';
 
-import { use, useState, useEffect } from 'react';
-import Link from 'next/link';
+import { use, useEffect, useRef, useState } from 'react';
+import { Star, Check, Loader2 } from 'lucide-react';
 
-export default function ReviewTapPage({ params }) {
-  const unwrappedParams = use(params);
-  const code = unwrappedParams.code || 'RW101';
+const TAGS = {
+  restaurant: ['Tasty food', 'Friendly staff', 'Quick service', 'Good portions', 'Nice ambience', 'Good value'],
+  cafe: ['Great coffee', 'Friendly staff', 'Cosy place', 'Quick service', 'Tasty snacks', 'Good value'],
+  salon: ['Great result', 'Friendly staff', 'Clean and hygienic', 'On time', 'Relaxing', 'Good value'],
+  clinic: ['Caring doctor', 'Clear explanation', 'Short wait', 'Clean clinic', 'Helpful staff'],
+  retail: ['Good range', 'Helpful staff', 'Fair prices', 'Quick billing', 'Easy to find things'],
+  hotel: ['Clean room', 'Helpful staff', 'Comfortable stay', 'Good location', 'Good breakfast'],
+  gym: ['Good equipment', 'Helpful trainers', 'Clean space', 'Not crowded', 'Good value'],
+  other: ['Friendly staff', 'Quick service', 'Good quality', 'Good value', 'Would come back'],
+};
 
-  const [business, setBusiness] = useState({
-    name: 'Reviewwo Partner Store',
-    city: 'Verified Location',
-    placeId: '',
-    rating: 5.0,
-    totalReviews: 0,
-    tableNumber: ''
-  });
+const RATING_WORDS = ['', 'Poor', 'Not great', 'Okay', 'Good', 'Excellent'];
 
-  const [rating, setRating] = useState(5);
-  const [selectedTag, setSelectedTag] = useState('Attentive Hospitality');
-  const [customDraft, setCustomDraft] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [shieldSubmitted, setShieldSubmitted] = useState(false);
-  const [shieldFeedback, setShieldFeedback] = useState('');
-  const [guestName, setGuestName] = useState('');
-  const [submittingShield, setSubmittingShield] = useState(false);
+function joinTags(tags) {
+  if (!tags.length) return '';
+  const lower = tags.map((t, i) => (i === 0 ? t : t.charAt(0).toLowerCase() + t.slice(1)));
+  const text = lower.length === 1 ? lower[0] : `${lower.slice(0, -1).join(', ')} and ${lower[lower.length - 1]}`;
+  return `${text}.`;
+}
 
-  useEffect(() => {
-    fetch(`/api/standees/resolve?code=${encodeURIComponent(code)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.business) {
-          setBusiness({
-            name: data.business.name || 'Reviewwo Partner Store',
-            city: data.business.city || 'Verified Location',
-            placeId: data.business.placeId || '',
-            rating: data.business.rating || 5.0,
-            totalReviews: data.business.totalReviews || 0,
-            tableNumber: data.business.tableNumber || ''
-          });
-        }
-      })
-      .catch(() => {});
-  }, [code]);
-
-  const tags = [
-    'Attentive Hospitality',
-    'Delicious Food & Fresh Taste',
-    'Cozy & Elegant Ambiance',
-    'Fast & Courteous Service',
-    'Great Drinks & Vibe',
-    'Outstanding Value'
-  ];
-
-  const draftTemplates = {
-    'Attentive Hospitality': [
-      `Had a wonderful experience at ${business.name}! The staff was extremely polite, attentive, and welcoming throughout our visit. Definitely 5 stars!`,
-      `Outstanding hospitality at ${business.name}! Team went above and beyond to make sure our table had everything. Highly recommend!`,
-    ],
-    'Delicious Food & Fresh Taste': [
-      `The food at ${business.name} was incredible! Every dish was fresh, flavorful, and cooked to perfection. Can't wait to return.`,
-      `Easily one of the best meals in town! ${business.name} exceeded our expectations. Great flavors and top-tier presentation.`,
-    ],
-    'Cozy & Elegant Ambiance': [
-      `Loved the atmosphere and music at ${business.name}. Beautiful interior aesthetics and very relaxing vibe for an evening out!`,
-      `The vibe at ${business.name} is second to none! Perfect spot for catching up with friends or date night. 5/5 stars!`,
-    ],
-    'Fast & Courteous Service': [
-      `Super quick service and courteous team at ${business.name}! Our orders arrived promptly and everything was seamless.`,
-      `Impressively efficient staff at ${business.name}. Polite, prompt, and thorough. 10/10 dining experience!`,
-    ],
-    'Great Drinks & Vibe': [
-      `Fantastic beverage selection and vibrant ambience at ${business.name}. Thoroughly enjoyed our time here!`,
-      `Top notch bar and great drinks at ${business.name}. Bartenders know their craft and service was super friendly.`,
-    ],
-    'Outstanding Value': [
-      `Amazing value for money at ${business.name}! Generous portions, premium quality, and friendly staff. Will definitely visit again.`,
-      `Solid 5-star experience at ${business.name}. Great quality without breaking the bank. Highly recommend to everyone!`,
-    ]
-  };
-
-  useEffect(() => {
-    const list = draftTemplates[selectedTag] || draftTemplates['Attentive Hospitality'];
-    setCustomDraft(list[0]);
-  }, [selectedTag, business.name]);
-
-  const handleSelectTag = (tag) => {
-    setSelectedTag(tag);
-    const list = draftTemplates[tag] || draftTemplates['Attentive Hospitality'];
-    const pick = list[Math.floor(Math.random() * list.length)];
-    setCustomDraft(pick);
-    setCopied(false);
-  };
-
-  const handleShuffleDraft = () => {
-    const list = draftTemplates[selectedTag] || draftTemplates['Attentive Hospitality'];
-    const other = list.find(d => d !== customDraft) || list[0];
-    setCustomDraft(other);
-    setCopied(false);
-  };
-
-  const handle1TapCopyAndOpenGoogle = () => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(customDraft);
+async function copyText(text) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
     }
-    setCopied(true);
+  } catch (e) {
+    // fall through to the legacy path
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
 
-    // Deep-link to Google Maps Write Review dialogue
-    setTimeout(() => {
-      const googleUrl = business.placeId
-        ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(business.placeId)}`
-        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name)}`;
-      window.open(googleUrl, '_blank');
-    }, 500);
+function RatingPicker({ value, onChange }) {
+  return (
+    <div role="radiogroup" aria-label="Your rating" className="flex justify-center gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          role="radio"
+          aria-checked={value === n}
+          aria-label={`${n} of 5 – ${RATING_WORDS[n]}`}
+          onClick={() => onChange(n)}
+          className="rounded-lg p-1.5 transition-transform active:scale-90"
+        >
+          <Star className={`h-10 w-10 ${n <= value ? 'fill-marigold text-marigold' : 'text-line'}`} strokeWidth={1.5} />
+        </button>
+      ))}
+    </div>
+  );
+}
 
-    setTimeout(() => {
-      setCopied(false);
-    }, 6000);
+function GoogleReview({ business, demo, rating, primary }) {
+  const tags = TAGS[business.category] || TAGS.other;
+  const [picked, setPicked] = useState([]);
+  const [text, setText] = useState('');
+  const [edited, setEdited] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const toggle = (t) => {
+    const next = picked.includes(t) ? picked.filter((x) => x !== t) : [...picked, t];
+    setPicked(next);
+    if (!edited) setText(joinTags(next));
   };
 
-  const handleSubmitShield = async (e) => {
-    e.preventDefault();
-    if (!shieldFeedback.trim()) return;
-    setSubmittingShield(true);
-    try {
-      await fetch('/api/shield/intercept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rating,
-          feedback: shieldFeedback,
-          customerName: guestName || 'In-Store Guest',
-          code
-        })
-      });
-      setShieldSubmitted(true);
-    } catch (err) {
-      alert('Feedback logged. Thank you!');
-      setShieldSubmitted(true);
-    } finally {
-      setSubmittingShield(false);
+  const href = business.placeId
+    ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(business.placeId)}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name} ${business.city}`)}`;
+
+  const onOpen = async (e) => {
+    if (demo) {
+      e.preventDefault();
+      setCopied(true);
+      return;
+    }
+    if (text.trim()) {
+      const ok = await copyText(text.trim());
+      setCopied(ok);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FFFE] flex flex-col justify-between max-w-md mx-auto shadow-2xl border-x border-[#0B3D3B]/10">
-      {/* Top Header */}
-      <header className="p-4 bg-white border-b border-[#0B3D3B]/10 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <img
-            src="/assets/img/logos/combo-dark.png"
-            alt="Reviewwo"
-            className="h-7 w-auto object-contain"
-          />
-        </Link>
-        <span className="text-[10px] font-bold text-[#14B8A6] bg-[#E6FFFB] px-2 py-0.5 rounded-full border border-[#14B8A6]/20">
-          NFC In-Store Tap #{code}
-        </span>
-      </header>
-
-      {/* Main Review Card */}
-      <main className="p-5 space-y-5 flex-1">
-        {/* Business Title Badge */}
-        <div className="text-center pt-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-[#0B3D3B] to-[#14B8A6] flex items-center justify-center text-white text-xl font-display font-black shadow-md mb-2">
-            🏪
-          </div>
-          <h1 className="text-xl font-display font-black text-[#0B3D3B]">
-            {business.name}
-          </h1>
-          <p className="text-xs text-[#4A706E]">
-            {business.city} • <span className="text-[#F59E0B] font-bold">★ {business.rating}</span> ({business.totalReviews} reviews)
-          </p>
-        </div>
-
-        {/* Interactive Star Rating */}
-        <div className="bg-white p-5 rounded-2xl border border-[#0B3D3B]/10 shadow-sm text-center">
-          <p className="text-xs font-display font-bold uppercase tracking-wider text-[#4A706E] mb-2.5">
-            How was your visit today?
-          </p>
-          <div className="flex justify-center items-center gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                className={`text-3xl transition-transform active:scale-125 hover:scale-110 ${
-                  star <= rating ? 'text-[#F59E0B]' : 'text-gray-300'
-                }`}
-                aria-label={`${star} Stars`}
-              >
-                ★
-              </button>
-            ))}
-          </div>
-          <p className="text-xs font-bold mt-2 text-[#0B3D3B]">
-            {rating === 5 && '🌟 Extraordinary 5-Star Experience!'}
-            {rating === 4 && '👍 Great Visit!'}
-            {rating === 3 && '😐 Average Experience'}
-            {rating <= 2 && '⚠️ Needs Immediate Improvement'}
-          </p>
-        </div>
-
-        {/* 4 & 5 STARS: 1-Tap Copy & Deep-Link to Google Maps */}
-        {rating >= 4 ? (
-          <div className="space-y-4">
-            {/* Tag selector */}
-            <div>
-              <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-2">
-                What did you enjoy the most?
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => handleSelectTag(tag)}
-                    className={`text-xs px-3 py-1.5 rounded-xl font-medium transition-all ${
-                      selectedTag === tag
-                        ? 'bg-[#0B3D3B] text-white shadow-sm font-bold scale-[1.02]'
-                        : 'bg-white border border-[#0B3D3B]/15 text-[#234745] hover:border-[#14B8A6]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* AI Draft Box */}
-            <div className="bg-white p-4 rounded-2xl border border-[#0B3D3B]/10 shadow-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-display font-bold text-[#14B8A6] uppercase tracking-wider flex items-center gap-1">
-                  ✨ Pre-Written 5★ Review
-                </span>
+    <section className="space-y-4">
+      {primary && rating >= 4 && (
+        <div>
+          <p className="text-[15px] font-medium text-ink">What stood out? (optional)</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {tags.map((t) => {
+              const on = picked.includes(t);
+              return (
                 <button
+                  key={t}
                   type="button"
-                  onClick={handleShuffleDraft}
-                  className="text-[11px] text-[#4A706E] hover:text-[#0B3D3B] font-semibold flex items-center gap-1"
+                  aria-pressed={on}
+                  onClick={() => toggle(t)}
+                  className={`h-9 rounded-full px-3.5 text-sm font-medium transition-colors ${
+                    on ? 'bg-brand-800 text-white' : 'border border-line bg-white text-ink'
+                  }`}
                 >
-                  🔄 Shuffle
+                  {t}
                 </button>
-              </div>
-              <textarea
-                rows={3}
-                value={customDraft}
-                onChange={(e) => setCustomDraft(e.target.value)}
-                className="w-full text-xs text-[#234745] p-2.5 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/15 focus:outline-none focus:border-[#14B8A6] leading-relaxed"
-              />
-              <p className="text-[10px] text-[#4A706E] italic">
-                Feel free to edit or personalize before posting!
-              </p>
-            </div>
-
-            {/* 1-TAP ACTION BUTTON */}
-            <button
-              type="button"
-              onClick={handle1TapCopyAndOpenGoogle}
-              className={`w-full py-4 px-6 rounded-2xl font-display font-black text-sm text-white shadow-xl transition-all flex items-center justify-center gap-2 ${
-                copied
-                  ? 'bg-[#10B981] scale-[0.99]'
-                  : 'bg-gradient-to-r from-[#0B3D3B] via-[#0D4B48] to-[#14B8A6] hover:brightness-110 active:scale-95'
-              }`}
-            >
-              {copied ? (
-                <>
-                  <span>✓</span> Review Copied! Opening Google...
-                </>
-              ) : (
-                <>
-                  <span>⚡</span> 1-Tap Copy &amp; Open Google Maps →
-                </>
-              )}
-            </button>
-
-            {/* Micro instruction */}
-            <div className="p-3 bg-[#E6FFFB] border border-[#14B8A6]/30 rounded-xl text-center space-y-1">
-              <p className="text-[11px] font-bold text-[#0B3D3B]">
-                How it works in 10 seconds:
-              </p>
-              <p className="text-[10px] text-[#4A706E] leading-relaxed">
-                1. Tap the button above (copies your review automatically).<br />
-                2. On Google Maps, select <strong>5 Stars</strong>, long-press to <strong>Paste</strong>, and hit <strong>Post</strong>!
-              </p>
-            </div>
+              );
+            })}
           </div>
-        ) : (
-          /* 1, 2, 3 STARS: Negative Review Shield - Dispatches WhatsApp Alert to Manager */
-          <div className="bg-white p-5 rounded-2xl border border-[#EF4444]/20 shadow-md space-y-4">
-            <div className="flex items-center gap-2 text-[#DC2626]">
-              <span className="text-xl">🛡️</span>
-              <h2 className="text-sm font-display font-bold">
-                Private Manager Grievance Channel
-              </h2>
-            </div>
-            <p className="text-xs text-[#4A706E] leading-relaxed">
-              We are genuinely sorry your visit was not 5-star. Your feedback is sent directly to the store manager's personal WhatsApp, giving our team a chance to fix it right now.
-            </p>
+        </div>
+      )}
 
-            {shieldSubmitted ? (
-              <div className="p-4 bg-[#E6FFFB] border border-[#14B8A6] rounded-xl text-center space-y-1">
-                <span className="text-xl">✅</span>
-                <p className="text-xs font-display font-bold text-[#0B3D3B]">
-                  Direct Manager Alert Dispatched
-                </p>
-                <p className="text-[11px] text-[#4A706E]">
-                  Our store manager has been notified on WhatsApp and will address your feedback immediately. Thank you for your patience!
-                </p>
-              </div>
+      <div>
+        <label htmlFor="review-text" className="text-[15px] font-medium text-ink">
+          Your review
+        </label>
+        <textarea
+          id="review-text"
+          rows={4}
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setEdited(true);
+          }}
+          placeholder="Write a few words about your visit"
+          className="input mt-2 text-[15px]"
+        />
+        <p className="mt-1.5 text-[13px] text-ink-subtle">
+          We’ll copy this for you. On Google, choose your stars, paste it in and post.
+        </p>
+      </div>
+
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        onClick={onOpen}
+        className={`btn btn-lg w-full ${primary ? 'btn-primary' : 'btn-secondary'}`}
+      >
+        {text.trim() ? 'Copy and open Google reviews' : 'Open Google reviews'}
+      </a>
+      {copied && (
+        <p className="flex items-center justify-center gap-1.5 text-sm text-emerald-800" role="status">
+          <Check className="h-4 w-4" aria-hidden="true" />
+          {demo ? 'This is a demo, so Google isn’t opened.' : 'Copied. Paste it into the review box on Google.'}
+        </p>
+      )}
+    </section>
+  );
+}
+
+function ManagerMessage({ code, rating, businessName, demo, primary }) {
+  const [feedback, setFeedback] = useState('');
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [state, setState] = useState('idle');
+  const [error, setError] = useState('');
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setState('sending');
+    try {
+      const res = await fetch('/api/shield/intercept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, rating, feedback, name, contact }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Your message could not be sent. Please try again.');
+      setState('sent');
+    } catch (err) {
+      setError(err.message);
+      setState('idle');
+    }
+  };
+
+  if (state === 'sent') {
+    return (
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900" role="status">
+        <p className="font-semibold">Thanks, your message has been sent to the manager.</p>
+        <p className="mt-1 text-[15px]">
+          {demo ? 'This is a demo, so nothing was actually sent.' : contact ? 'They may get in touch with you.' : 'They will read it shortly.'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <h2 className="font-sans text-lg font-semibold text-ink">
+          {primary ? 'Tell the manager what happened' : 'Or send a private message to the manager'}
+        </h2>
+        <p className="mt-1 text-[15px] text-ink-muted">
+          This goes straight to the manager at {businessName}. It is not posted publicly.
+        </p>
+      </div>
+      <div>
+        <label htmlFor="fb" className="label">Your message</label>
+        <textarea id="fb" required rows={4} value={feedback} onChange={(e) => setFeedback(e.target.value)} className="input text-[15px]" />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="fb-name" className="label">Name (optional)</label>
+          <input id="fb-name" value={name} onChange={(e) => setName(e.target.value)} className="input" autoComplete="name" />
+        </div>
+        <div>
+          <label htmlFor="fb-contact" className="label">Phone (optional)</label>
+          <input id="fb-contact" type="tel" value={contact} onChange={(e) => setContact(e.target.value)} className="input" autoComplete="tel" />
+        </div>
+      </div>
+      {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
+      <button type="submit" disabled={state === 'sending'} className={`btn btn-lg w-full ${primary ? 'btn-primary' : 'btn-secondary'}`}>
+        {state === 'sending' && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+        Send to the manager
+      </button>
+    </form>
+  );
+}
+
+export default function ReviewPage({ params }) {
+  const { code } = use(params);
+  const [status, setStatus] = useState('loading');
+  const [business, setBusiness] = useState(null);
+  const [demo, setDemo] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [showPrivate, setShowPrivate] = useState(false);
+  const counted = useRef(false);
+
+  useEffect(() => {
+    if (counted.current) return;
+    counted.current = true;
+    let scan = '1';
+    try {
+      const key = `rw_scan_${code}`;
+      if (sessionStorage.getItem(key)) scan = '0';
+      else sessionStorage.setItem(key, '1');
+    } catch (e) {
+      // storage unavailable: still count the visit
+    }
+    fetch(`/api/standees/resolve?code=${encodeURIComponent(code)}&scan=${scan}`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.found) {
+          setBusiness(d.business);
+          setDemo(Boolean(d.demo));
+          setStatus('ready');
+        } else setStatus('missing');
+      })
+      .catch(() => setStatus('error'));
+  }, [code]);
+
+  if (status === 'loading') {
+    return <div className="min-h-screen bg-white" aria-busy="true" />;
+  }
+
+  if (status !== 'ready') {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
+        <div className="max-w-sm">
+          <h1 className="text-2xl font-bold">{status === 'missing' ? 'This card isn’t set up yet' : 'Something went wrong'}</h1>
+          <p className="mt-2 text-ink-muted">
+            {status === 'missing'
+              ? 'Please let a member of staff know. Thank you for wanting to leave a review.'
+              : 'Check your connection and try scanning again.'}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  const low = rating > 0 && rating <= 3;
+
+  return (
+    <div className="flex min-h-screen flex-col bg-white">
+      {demo && (
+        <div className="bg-brand-800 px-4 py-2 text-center text-[13px] text-white">
+          Demo page. Nothing you enter here is sent or posted.
+        </div>
+      )}
+      <main className="mx-auto w-full max-w-md flex-1 px-5 pb-12 pt-10">
+        <header className="text-center">
+          <p className="text-sm text-ink-subtle">{business.city || 'Thanks for visiting'}</p>
+          <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">{business.name}</h1>
+        </header>
+
+        <section className="mt-8 text-center">
+          <p className="text-lg font-medium text-ink">How was your visit?</p>
+          <div className="mt-3">
+            <RatingPicker
+              value={rating}
+              onChange={(n) => {
+                setRating(n);
+                setShowPrivate(false);
+              }}
+            />
+          </div>
+          <p className="mt-1 h-6 text-[15px] text-ink-muted" aria-live="polite">
+            {RATING_WORDS[rating]}
+          </p>
+        </section>
+
+        {rating > 0 && (
+          <div className="mt-6 space-y-8">
+            {low ? (
+              <>
+                <ManagerMessage code={code} rating={rating} businessName={business.name} demo={demo} primary />
+                <div className="border-t border-line pt-6">
+                  <h2 className="font-sans text-lg font-semibold text-ink">Want to leave a Google review too?</h2>
+                  <p className="mb-4 mt-1 text-[15px] text-ink-muted">You can post your review publicly on Google as well.</p>
+                  <GoogleReview business={business} demo={demo} rating={rating} primary={false} />
+                </div>
+              </>
             ) : (
-              <form onSubmit={handleSubmitShield} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                    What fell short today?
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    placeholder="Tell us what went wrong (slow service, food quality, temperature, etc.)..."
-                    value={shieldFeedback}
-                    onChange={(e) => setShieldFeedback(e.target.value)}
-                    className="w-full text-xs p-3 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:bg-white focus:outline-none focus:border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20 transition-all text-[#0B3D3B]"
-                  />
+              <>
+                <GoogleReview business={business} demo={demo} rating={rating} primary />
+                <div className="border-t border-line pt-6">
+                  {showPrivate ? (
+                    <ManagerMessage code={code} rating={rating} businessName={business.name} demo={demo} primary={false} />
+                  ) : (
+                    <button type="button" onClick={() => setShowPrivate(true)} className="link text-[15px]">
+                      Something we could do better? Message the manager
+                    </button>
+                  )}
                 </div>
-
-                <div>
-                  <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
-                    Your Name or Phone (Optional, for resolution)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. John • +91 98765 43210"
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    className="h-12 w-full text-sm font-medium px-4 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:bg-white focus:outline-none focus:border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20 transition-all text-[#0B3D3B]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={submittingShield}
-                  className="h-12 w-full bg-[#0B3D3B] hover:bg-[#DC2626] text-white text-xs font-display font-bold rounded-xl transition-all shadow flex items-center justify-center gap-2"
-                >
-                  {submittingShield ? 'Sending to Manager...' : 'Alert Store Manager on WhatsApp →'}
-                </button>
-              </form>
+              </>
             )}
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="p-4 text-center border-t border-[#0B3D3B]/10 bg-white">
-        <p className="text-[10px] text-[#4A706E]">
-          Powered by <strong className="text-[#0B3D3B]">Reviewwo</strong> • 1-Tap Google Review Velocity
-        </p>
+      <footer className="pb-6 text-center text-xs text-ink-subtle">
+        Review page by Reviewwo. Google is a trademark of Google LLC.
       </footer>
     </div>
   );

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { AUTH_COOKIE } from '../../../../src/lib/store.js';
 
 export async function POST() {
-  const response = NextResponse.json({ success: true, message: 'Logged out successfully.' });
-  response.cookies.delete('rw_auth_token');
+  const response = NextResponse.json({ success: true });
+  response.cookies.set(AUTH_COOKIE, '', { path: '/', maxAge: 0 });
   return response;
 }

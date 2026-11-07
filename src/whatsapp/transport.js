@@ -1,49 +1,58 @@
-import fs from 'fs';
-import path from 'path';
 import { waSocket } from './socketAdapter.js';
+import { loadData, saveData } from '../lib/store.js';
+
+const DEFAULT_TEMPLATES = {
+  otp: 'Your Reviewwo sign-in code is {{otp}}.\n\nIt expires in 5 minutes. Do not share it with anyone.',
+  feedback_alert:
+    'New feedback for {{business_name}}\n\nRating: {{stars}} of 5\nWhere: {{where}}\nFrom: {{customer_name}}\nContact: {{customer_contact}}\n\n"{{feedback}}"\n\nOpen your Reviewwo dashboard to mark it resolved.',
+  test_alert:
+    'This is a test message from Reviewwo for {{business_name}}.\n\nFeedback alerts from your NFC cards will arrive on this number.',
+};
+
+function fill(template, values) {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => (values[key] ?? '').toString());
+}
 
 class WhatsAppTransport {
   constructor() {
     this.adapter = waSocket;
-    this.templatesFile = path.resolve('data/templates.json');
   }
 
   getTemplates() {
-    try {
-      if (fs.existsSync(this.templatesFile)) {
-        return JSON.parse(fs.readFileSync(this.templatesFile, 'utf8'));
-      }
-    } catch (e) {}
-    return {
-      otp: "Your Reviewwo QR verification code is *{{otp}}*.",
-      grievance_alert: "⚠️ Private Shield Alert: {{feedback}}",
-      review_invite: "Hi {{customer_name}}, thank you for dining with us!"
-    };
+    const stored = loadData('templates.json', {});
+    return { ...DEFAULT_TEMPLATES, ...(stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {}) };
   }
 
-  saveTemplates(newTemplates) {
-    fs.writeFileSync(this.templatesFile, JSON.stringify(newTemplates, null, 2), 'utf8');
-    return newTemplates;
+  saveTemplates(next) {
+    const allowed = {};
+    for (const key of Object.keys(DEFAULT_TEMPLATES)) {
+      if (typeof next?.[key] === 'string' && next[key].trim()) allowed[key] = next[key].slice(0, 2000);
+    }
+    const merged = { ...this.getTemplates(), ...allowed };
+    saveData('templates.json', merged);
+    return merged;
   }
 
-  async sendOtp(mobile, rawOtp) {
-    const templates = this.getTemplates();
-    const text = templates.otp.replace('{{otp}}', rawOtp);
-    return await this.adapter.sendMessage(mobile, text, 'otp_verification');
+  async sendOtp(mobile, otp) {
+    const text = fill(this.getTemplates().otp, { otp });
+    return this.adapter.sendMessage(mobile, text, 'otp');
   }
 
-  async sendGrievanceAlert(managerMobile, { stars, tableNo, customerName, customerPhone, feedback }) {
-    const templates = this.getTemplates();
-    const cleanPhone = (customerPhone || '').replace(/[^0-9]/g, '');
-    let text = templates.grievance_alert
-      .replace('{{stars}}', stars)
-      .replace('{{table_no}}', tableNo || 'Counter')
-      .replace('{{customer_name}}', customerName || 'Guest')
-      .replace('{{customer_phone}}', customerPhone || 'Not provided')
-      .replace('{{feedback}}', feedback || 'No written comment')
-      .replace('{{clean_phone}}', cleanPhone);
+  async sendFeedbackAlert(mobile, { businessName, stars, where, customerName, customerContact, feedback }) {
+    const text = fill(this.getTemplates().feedback_alert, {
+      business_name: businessName || 'your business',
+      stars,
+      where: where || 'Not specified',
+      customer_name: customerName || 'Not given',
+      customer_contact: customerContact || 'Not given',
+      feedback: feedback || '',
+    });
+    return this.adapter.sendMessage(mobile, text, 'feedback_alert');
+  }
 
-    return await this.adapter.sendMessage(managerMobile, text, 'grievance_alert');
+  async sendTestAlert(mobile, { businessName }) {
+    const text = fill(this.getTemplates().test_alert, { business_name: businessName || 'your business' });
+    return this.adapter.sendMessage(mobile, text, 'test_alert');
   }
 }
 

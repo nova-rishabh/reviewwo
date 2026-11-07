@@ -1,73 +1,65 @@
 import { NextResponse } from 'next/server';
-import { verifyPaymentSignature, PLAN_PRICING } from '../../../../src/lib/razorpay.js';
-import { loadData, saveData, authenticateRequest } from '../../../../src/lib/store.js';
+import { getRazorpayClient, verifyPaymentSignature, PLAN_PRICING } from '../../../../src/lib/razorpay.js';
+import { loadData, saveData, currentUserRecord } from '../../../../src/lib/store.js';
 
 export async function POST(request) {
+  const user = currentUserRecord(request);
+  if (!user) return NextResponse.json({ error: 'Sign in again to finish your payment.' }, { status: 401 });
+
   try {
-    const user = authenticateRequest(request);
-    const body = await request.json();
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      plan = 'growth',
-      billingCycle = 'monthly'
-    } = body;
+    const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } =
+      await request.json();
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return NextResponse.json({ error: 'Missing payment verification parameters.' }, { status: 400 });
+    if (!orderId || !paymentId || !signature) {
+      return NextResponse.json({ error: 'Payment details are missing.' }, { status: 400 });
+    }
+    if (!verifyPaymentSignature({ orderId, paymentId, signature })) {
+      return NextResponse.json({ error: 'We could not verify this payment.' }, { status: 400 });
     }
 
-    const isValid = verifyPaymentSignature({
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      signature: razorpay_signature
-    });
-
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid Razorpay signature. Verification failed.' }, { status: 400 });
-    }
-
-    // Save payment log
     const payments = loadData('payments.json', []);
-    const planConfig = PLAN_PRICING[plan] || PLAN_PRICING.growth;
-    const paymentRecord = {
+    if (payments.some((p) => p.paymentId === paymentId)) {
+      return NextResponse.json({ success: true, message: 'This payment was already applied to your account.' });
+    }
+
+    // Read plan details from the order itself, not from the request.
+    const razorpay = getRazorpayClient();
+    const order = await razorpay.orders.fetch(orderId);
+    const planId = order?.notes?.planId;
+    const billingCycle = order?.notes?.billingCycle === 'annual' ? 'annual' : 'monthly';
+    const plan = PLAN_PRICING[planId];
+    if (!plan || order?.notes?.userId !== user.id) {
+      return NextResponse.json({ error: 'This payment does not belong to your account.' }, { status: 400 });
+    }
+
+    const amountInr = Number(order.amount) / 100;
+    const now = new Date().toISOString();
+    payments.unshift({
       id: `pay_${Date.now()}`,
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      amount: billingCycle === 'annual' ? planConfig.annualPrice : planConfig.monthlyPrice,
-      currency: 'INR',
-      plan: planConfig.name,
-      planId: plan,
+      orderId,
+      paymentId,
+      amount: amountInr,
+      currency: order.currency,
+      planId,
       billingCycle,
-      userId: user ? user.id : 'unregistered',
-      userEmail: user ? user.email : '',
-      timestamp: new Date().toISOString(),
-      status: 'captured'
-    };
-    payments.unshift(paymentRecord);
+      userId: user.id,
+      createdAt: now,
+    });
     saveData('payments.json', payments);
 
-    // Update user subscription if logged in
-    if (user) {
-      const users = loadData('users.json', []);
-      const userIndex = users.findIndex(u => u.id === user.id);
-      if (userIndex !== -1) {
-        users[userIndex].plan = plan;
-        users[userIndex].planPrice = paymentRecord.amount;
-        users[userIndex].planStatus = 'active';
-        users[userIndex].billingCycle = billingCycle;
-        users[userIndex].lastPaymentDate = paymentRecord.timestamp;
-        saveData('users.json', users);
-      }
+    const users = loadData('users.json', []);
+    const record = users.find((u) => u.id === user.id);
+    if (record) {
+      record.plan = planId;
+      record.billingCycle = billingCycle;
+      record.planStatus = 'active';
+      record.lastPaymentDate = now;
+      record.planPrice = billingCycle === 'annual' ? Math.round(plan.annualPrice / 12) : plan.monthlyPrice;
+      saveData('users.json', users);
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `Payment verified! You are now subscribed to Reviewwo ${planConfig.name} plan.`,
-      payment: paymentRecord
-    });
+    return NextResponse.json({ success: true, message: `You’re now on the ${plan.name} plan.` });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'We could not confirm your payment. Contact us if you were charged.' }, { status: 500 });
   }
 }

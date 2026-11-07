@@ -3,128 +3,77 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
 export const metadata = {
-  title: 'Platform Features — Reviewwo',
-  description: 'Deep dive into the Reviewwo autonomous review acceleration engine: 1-tap copy & Google deep-linking, sovereign WhatsApp manager alerts, negative review shield, and laser-engraved acrylic hardware.',
+  title: 'Features | Reviewwo',
+  description:
+    'NFC review cards, a mobile review page for your business, private feedback with manager alerts on WhatsApp, and scan tracking.',
 };
 
+const groups = [
+  {
+    title: 'For your customers',
+    items: [
+      ['A page with your name on it', 'Tapping the card opens a short page with your business name and a star rating. It loads fast on mobile data.'],
+      ['Help with what to write', 'Customers can pick what stood out, such as “Friendly staff”, to get a starting sentence they can change.'],
+      ['Straight to Google', 'One tap copies their words and opens the Google review form for your listing.'],
+      ['A direct line to the manager', 'Anyone can send a private message to the manager instead of, or as well as, posting a review.'],
+    ],
+  },
+  {
+    title: 'For you',
+    items: [
+      ['Manager alerts on WhatsApp', 'Private messages are sent to your manager’s WhatsApp with the rating, the card it came from and the comment.'],
+      ['Feedback inbox', 'All messages are saved in your dashboard. Mark each one resolved when it has been dealt with.'],
+      ['Scans per card', 'Name each card after where it sits and see how often it is used.'],
+      ['Print-ready codes', 'Download any card’s QR code as PNG or SVG.'],
+    ],
+  },
+];
+
 export default function FeaturesPage() {
-  const featureList = [
-    {
-      title: '1-Tap Review Copy & Google Deep-Link',
-      category: 'Frictionless Conversion',
-      icon: '✨',
-      description: 'Customers want to leave a good review, but "writer\'s block" causes 78% of them to abandon. Our dynamic prompt engine generates 3 authentic drafts in English or Hinglish. With 1 tap, the draft is copied to their clipboard and the official Google review modal opens automatically.',
-      highlights: ['Overcomes review abandonment', 'Zero app download or customer phone number needed', 'Pre-written draft copied & Google dialogue launched in 1 click']
-    },
-    {
-      title: 'Manager Grievance Alert Rail (WhatsApp Socket)',
-      category: 'Reputation Defense',
-      icon: '🛡️',
-      description: 'Keep your public Google rating untarnished at 4.9★. If a customer rates their experience 1 to 3 stars, they are instantly redirected to a private manager feedback form instead of Google. The socket immediately fires an alert to the store manager\'s personal WhatsApp with table/ticket details.',
-      highlights: ['Deflects 100% of impulsive 1-star reviews', 'Immediate WhatsApp alert to store manager\'s phone', 'On-the-spot customer resolution before they leave']
-    },
-    {
-      title: 'Merchant WhatsApp OTP Authentication',
-      category: 'Zero SMS Costs',
-      icon: '💬',
-      description: 'Merchants and store owners sign into the Reviewwo console passwordless using a 6-digit WhatsApp OTP delivered via our sovereign multi-device socket. Zero third-party SMS carrier fees (Twilio/MSG91) and instant delivery.',
-      highlights: ['₹0.00 carrier SMS costs forever', 'High security multi-device socket pair', 'Instant 6-digit WhatsApp OTP delivery']
-    },
-    {
-      title: 'Dual-Frequency NFC + QR Standees',
-      category: 'Physical Hardware',
-      icon: '🏷️',
-      description: 'Museum-grade frosted acrylic stands with embedded NTAG213 high-speed NFC microchips and crisp, scratch-resistant vector QR engraving. Designed to look stunning on cashier counters and dining tables.',
-      highlights: ['Dual-tap NFC for iOS & Android', '7x5" & 5x4" high-durability acrylic', 'Direct Google Maps Place ID deep link']
-    },
-    {
-      title: '24/7 Autopilot Review Reply Agent',
-      category: 'Local SEO Booster',
-      icon: '🤖',
-      description: 'Google explicitly rewards businesses that reply to 100% of their customer reviews. Our autonomous agent posts intelligent, keyword-rich replies within 180 seconds of review publication.',
-      highlights: ['100% response rate on Google Business Profile', 'Significantly boosts Google Maps 3-Pack ranking', 'Contextual and personalized tone']
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-[#F8FFFE] text-[#234745] flex flex-col font-sans">
+    <div className="flex min-h-screen flex-col bg-white">
       <Navbar />
+      <main className="flex-1">
+        <section className="mx-auto max-w-6xl px-4 pb-12 pt-14 sm:px-6 lg:pt-20">
+          <h1 className="max-w-2xl text-4xl font-bold leading-[1.1] sm:text-5xl">What Reviewwo does</h1>
+          <p className="mt-5 max-w-xl text-lg text-ink-muted">
+            Two things: makes it easy for customers to review you on Google, and gives them a quick way to tell you
+            when something went wrong.
+          </p>
+        </section>
 
-      <main className="flex-1 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          {/* Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs font-display font-extrabold text-[#14B8A6] uppercase tracking-wider px-3 py-1 bg-[#E6FFFB] rounded-full border border-[#14B8A6]/20">
-              Enterprise Feature Suite
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-display font-black text-[#0B3D3B] tracking-tight">
-              Engineered for In-Store Review Velocity
-            </h1>
-            <p className="text-base text-[#4A706E] leading-relaxed">
-              Every component of Reviewwo is built to remove friction for the customer, protect your public star rating, and give store managers immediate visibility.
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featureList.map((feat, idx) => (
-              <div
-                key={idx}
-                className="p-8 rounded-3xl bg-white border border-[#0B3D3B]/10 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl">{feat.icon}</span>
-                    <span className="text-[10px] font-display font-bold uppercase tracking-wider text-[#14B8A6] px-2.5 py-1 rounded bg-[#E6FFFB] border border-[#14B8A6]/30">
-                      {feat.category}
-                    </span>
+        {groups.map((g, gi) => (
+          <section key={g.title} className={`border-t border-line py-16 ${gi % 2 ? 'bg-canvas' : ''}`}>
+            <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_2fr]">
+              <h2 className="text-3xl font-bold">{g.title}</h2>
+              <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+                {g.items.map(([t, d]) => (
+                  <div key={t}>
+                    <h3 className="font-sans text-lg font-semibold">{t}</h3>
+                    <p className="mt-1.5 text-ink-muted">{d}</p>
                   </div>
-                  <h3 className="text-xl font-display font-black text-[#0B3D3B]">{feat.title}</h3>
-                  <p className="text-xs text-[#4A706E] leading-relaxed">{feat.description}</p>
-                </div>
-
-                <div className="pt-4 border-t border-[#0B3D3B]/10 space-y-2">
-                  {feat.highlights.map((h, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs font-semibold text-[#0B3D3B]">
-                      <span className="text-[#10B981]">✓</span>
-                      <span>{h}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* CTA Box */}
-            <div className="p-8 rounded-3xl bg-gradient-to-br from-[#0B3D3B] to-[#14B8A6] text-white shadow-xl flex flex-col justify-between space-y-6">
-              <div className="space-y-3">
-                <span className="text-xs font-display font-bold uppercase tracking-wider text-[#99F6E4]">
-                  Deploy Today
-                </span>
-                <h3 className="text-2xl font-display font-black">Ready to Dominate Local Google Search?</h3>
-                <p className="text-xs text-[#C5EBE8] leading-relaxed">
-                  Start on our Starter plan at ₹149/mo or Growth at ₹299/mo. Order your custom acrylic counter standee and be live in 10 minutes.
-                </p>
-              </div>
-
-              <div className="pt-4 flex flex-col sm:flex-row gap-3">
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0B3D3B] text-xs font-display font-black rounded-xl shadow hover:bg-[#E6FFFB] hover:text-[#0B3D3B] transition-all"
-                >
-                  Create Account Free →
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-black/20 hover:bg-black/30 text-white text-xs font-display font-bold rounded-xl border border-white/20 transition-all"
-                >
-                  View All Pricing
-                </Link>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-      </main>
+          </section>
+        ))}
 
+        <section className="border-t border-line py-16">
+          <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-center">
+            <p className="max-w-lg text-lg text-ink-muted">
+              Want to see it from the customer’s side? Open the demo review page on your phone.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link href="/r/demo" className="btn btn-secondary btn-lg">
+                Try the review page
+              </Link>
+              <Link href="/register" className="btn btn-primary btn-lg">
+                Get started
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
       <Footer />
     </div>
   );

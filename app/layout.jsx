@@ -2,34 +2,30 @@ import './globals.css';
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://reviewwo.divergit.com'),
-  title: 'Reviewwo — Autonomous Google Review Velocity Platform',
-  description: 'Turn in-store foot traffic into 5-star Google reviews. 1-tap copy & Google Maps deep link, private negative review shield with instant manager WhatsApp alerts, and premium NFC acrylic standees.',
+  title: 'Reviewwo | NFC cards for Google reviews',
+  description:
+    'NFC review cards that make it easy for customers to review your business on Google, with private feedback and instant manager alerts.',
   icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.png', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-icon.png' },
-    ],
+    icon: [{ url: '/favicon.ico' }, { url: '/favicon.png', type: 'image/png' }],
+    apple: [{ url: '/apple-icon.png' }],
   },
   openGraph: {
-    title: 'Reviewwo — 5-Star Review Acceleration Platform',
-    description: 'Autonomous in-store review engine: 1-tap copy & Google deep-link, instant manager grievance alerts via sovereign WhatsApp socket, and dual-tap NFC standees.',
+    title: 'Reviewwo | NFC cards for Google reviews',
+    description: 'NFC review cards that help local businesses collect Google reviews in person.',
     type: 'website',
-  }
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0B3D3B',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </head>
-      <body className="font-sans antialiased text-[#234745] bg-[#F8FFFE]">
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

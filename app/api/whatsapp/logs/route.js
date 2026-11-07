@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { authenticateRequest } from '../../../../src/lib/store.js';
+import { currentAdmin } from '../../../../src/lib/store.js';
 import { waSocket } from '../../../../src/whatsapp/socketAdapter.js';
 
-export async function GET(request) {
-  const user = authenticateRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const dynamic = 'force-dynamic';
 
+export async function GET(request) {
+  if (!currentAdmin(request)) return NextResponse.json({ error: 'Admins only.' }, { status: 403 });
   return NextResponse.json(waSocket.getLogs(50));
 }

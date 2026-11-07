@@ -1,206 +1,222 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import DashboardHeader from '../../../components/DashboardHeader';
+import { useState } from 'react';
+import Link from 'next/link';
+import { ExternalLink, Loader2 } from 'lucide-react';
+import { PageHeader, useDashboardUser } from '../../../components/DashboardShell';
+import { apiPost, CATEGORIES, googleReviewUrl, PLACE_ID_FINDER_URL } from '../../../components/api';
+import { SectionCard, ErrorNote } from '../../../components/ui';
 import RazorpayCheckoutButton from '../../../components/RazorpayCheckoutButton';
 
-export default function SettingsPage() {
-  const [user, setUser] = useState({
-    name: '',
-    businessName: '',
-    email: '',
-    mobile: '',
-    googlePlaceId: '',
-    plan: 'growth',
-    planPrice: 299
-  });
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
+const local = (m) => String(m || '').replace(/^\+91/, '');
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.json())
-      .then(d => {
-        if (d.authenticated && d.user) {
-          setUser(d.user);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setMessage('');
+function useSection(initial) {
+  const { refresh } = useDashboardUser();
+  const [values, setValues] = useState(initial);
+  const [state, setState] = useState({ saving: false, error: '', saved: false });
+  const set = (k) => (e) => {
+    setValues((v) => ({ ...v, [k]: e.target.value }));
+    setState((s) => ({ ...s, saved: false }));
+  };
+  const save = async (e) => {
+    e?.preventDefault();
+    setState({ saving: true, error: '', saved: false });
     try {
-      const res = await fetch('/api/settings/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: user.name,
-          businessName: user.businessName,
-          mobile: user.mobile,
-          googlePlaceId: user.googlePlaceId
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setMessage('Settings updated successfully!');
-      } else {
-        setMessage('Error saving settings: ' + (data.error || 'Unknown error'));
-      }
-    } catch (e) {
-      setMessage('Error: ' + e.message);
-    } finally {
-      setSaving(false);
+      await apiPost('/api/settings/profile', values);
+      setState({ saving: false, error: '', saved: true });
+      refresh();
+    } catch (err) {
+      setState({ saving: false, error: err.message, saved: false });
+    }
+  };
+  return { values, set, save, state };
+}
+
+function SaveFooter({ state, label = 'Save changes' }) {
+  return (
+    <>
+      {state.saved && <span className="text-sm text-emerald-800" role="status">Saved</span>}
+      <button type="submit" disabled={state.saving} className="btn btn-primary btn-sm">
+        {state.saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />} {label}
+      </button>
+    </>
+  );
+}
+
+function PhoneInput({ id, value, onChange, required }) {
+  return (
+    <div className="flex">
+      <span className="inline-flex h-11 items-center rounded-l-lg border border-r-0 border-line bg-canvas px-3 text-sm font-medium text-ink-muted">+91</span>
+      <input id={id} type="tel" inputMode="numeric" required={required} value={value} onChange={onChange} className="input rounded-l-none" />
+    </div>
+  );
+}
+
+const PLAN_NAMES = { starter: 'Starter', growth: 'Growth', agency: 'Agency' };
+
+export default function SettingsPage() {
+  const { user, refresh } = useDashboardUser();
+  const business = useSection({ businessName: user.businessName, category: user.category, city: user.city });
+  const google = useSection({ googlePlaceId: user.googlePlaceId });
+  const alerts = useSection({ alertName: user.alertName, alertMobile: local(user.alertMobile) });
+  const account = useSection({ name: user.name, mobile: local(user.mobile) });
+  const [test, setTest] = useState({ state: 'idle', message: '' });
+  const [planMsg, setPlanMsg] = useState('');
+
+  const sendTest = async () => {
+    setTest({ state: 'sending', message: '' });
+    try {
+      const res = await apiPost('/api/whatsapp/send-test');
+      setTest({ state: 'sent', message: `Test message sent to ${res.to}.` });
+    } catch (err) {
+      setTest({ state: 'failed', message: err.message });
     }
   };
 
   return (
-    <div>
-      <DashboardHeader
-        title="Settings &amp; Integrations"
-        subtitle="Manage your Google Place ID linkage, business identity, and subscription tier."
-      />
+    <>
+      <PageHeader title="Settings" description="Your business details, Google listing, alerts and plan." />
 
-      <div className="p-8 max-w-4xl space-y-8">
-        {message && (
-          <div className="p-4 rounded-2xl bg-[#E6FFFB] border border-[#14B8A6]/40 text-xs font-bold text-[#0B3D3B]">
-            {message}
-          </div>
-        )}
+      <div className="grid max-w-5xl gap-6">
+        <form onSubmit={business.save}>
+          <SectionCard id="business" title="Business" description="Shown to customers when they tap your card." footer={<SaveFooter state={business.state} />}>
+            <ErrorNote message={business.state.error} />
+            <div className="grid gap-5 md:grid-cols-3">
+              <div className="md:col-span-1">
+                <label htmlFor="bn" className="label">Business name</label>
+                <input id="bn" required value={business.values.businessName} onChange={business.set('businessName')} className="input" />
+              </div>
+              <div>
+                <label htmlFor="cat" className="label">Type of business</label>
+                <select id="cat" required value={business.values.category} onChange={business.set('category')} className="input">
+                  <option value="" disabled>Choose one</option>
+                  {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="city" className="label">City</label>
+                <input id="city" required value={business.values.city} onChange={business.set('city')} className="input" />
+              </div>
+            </div>
+          </SectionCard>
+        </form>
 
-        {/* Google Place ID Configuration */}
-        <div className="p-6 rounded-2xl bg-white border border-[#0B3D3B]/10 shadow-sm space-y-4">
-          <div className="border-b border-[#0B3D3B]/10 pb-3">
-            <h3 className="font-display font-extrabold text-base text-[#0B3D3B]">Google Business Profile Sync</h3>
-            <p className="text-xs text-[#4A706E]">
-              Connect your verified Google Place ID so customers tapping your standees are directed immediately to your 5-star Google review dialog with prewritten text.
+        <form onSubmit={google.save}>
+          <SectionCard
+            id="google"
+            title="Google listing"
+            description="Customers are sent to the review form for this listing."
+            footer={<SaveFooter state={google.state} />}
+          >
+            <ErrorNote message={google.state.error} />
+            <label htmlFor="pid" className="label">Google Place ID</label>
+            <input
+              id="pid"
+              required
+              value={google.values.googlePlaceId}
+              onChange={google.set('googlePlaceId')}
+              className="input font-mono text-[13px]"
+              spellCheck={false}
+              placeholder="ChIJ…"
+            />
+            <p className="hint">
+              Find it with Google’s{' '}
+              <a href={PLACE_ID_FINDER_URL} target="_blank" rel="noreferrer" className="link">Place ID finder</a>.
             </p>
-          </div>
-
-          <form onSubmit={handleSaveProfile} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
-                Google Place ID
-              </label>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  placeholder="e.g. ChIJN1t_tDeuEmsRUsoyG83frY4"
-                  value={user.googlePlaceId || ''}
-                  onChange={(e) => setUser({ ...user, googlePlaceId: e.target.value })}
-                  className="flex-1 text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
-                />
-              </div>
-              <p className="text-[11px] text-[#4A706E] mt-1">
-                Can be obtained directly from your Google Business Profile manager or Google Maps Place ID Finder.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
-                  Business Trading Name
-                </label>
-                <input
-                  type="text"
-                  value={user.businessName || ''}
-                  onChange={(e) => setUser({ ...user, businessName: e.target.value })}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
-                  Primary Contact Person
-                </label>
-                <input
-                  type="text"
-                  value={user.name || ''}
-                  onChange={(e) => setUser({ ...user, name: e.target.value })}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
-                  Account Email
-                </label>
-                <input
-                  type="email"
-                  disabled
-                  value={user.email || ''}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/10 bg-gray-50 text-gray-500 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
-                  Manager WhatsApp Alert Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={user.mobile || ''}
-                  onChange={(e) => setUser({ ...user, mobile: e.target.value })}
-                  placeholder="+91 9876543210"
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="py-2.5 px-6 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
-            >
-              {saving ? 'Saving Changes...' : 'Save Settings'}
-            </button>
-          </form>
-        </div>
-
-        {/* Subscription Plan Overview */}
-        <div className="p-6 rounded-2xl bg-white border border-[#0B3D3B]/10 shadow-sm space-y-4">
-          <div className="border-b border-[#0B3D3B]/10 pb-3 flex items-center justify-between">
-            <div>
-              <h3 className="font-display font-extrabold text-base text-[#0B3D3B]">Subscription Plan</h3>
-              <p className="text-xs text-[#4A706E]">Your active SaaS plan and license entitlements</p>
-            </div>
-            <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase bg-[#E6FFFB] text-[#0B3D3B] border border-[#14B8A6]/30">
-              {user.plan} Tier
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <span className="text-xl font-display font-black text-[#0B3D3B]">₹{user.planPrice || 299}</span>
-              <span className="text-xs text-[#4A706E]"> / month (billed automatically)</span>
-              <p className="text-xs text-[#234745] mt-1">
-                Includes 1-Tap Google Review Deep-Linking, Smart Negative Feedback Shield with Manager WhatsApp Alerts, and AI Autopilot Replies.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <RazorpayCheckoutButton
-                plan={user.plan || 'growth'}
-                billingCycle="monthly"
-                className="px-4 py-2.5 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
-                onSuccess={(data) => {
-                  setMessage('🎉 Subscription activated successfully via Razorpay!');
-                  fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setUser(d.user); });
-                }}
-              >
-                Pay via Razorpay →
-              </RazorpayCheckoutButton>
-              <a
-                href="/pricing"
-                className="px-4 py-2.5 bg-[#E6FFFB] border border-[#14B8A6]/40 text-[#0B3D3B] hover:bg-[#14B8A6] hover:text-white text-xs font-display font-bold rounded-xl transition-all shadow"
-              >
-                Change Plan →
+            {google.values.googlePlaceId?.trim().length >= 20 && (
+              <a href={googleReviewUrl(google.values.googlePlaceId.trim())} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm mt-4">
+                Check it opens your listing <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
+            )}
+          </SectionCard>
+        </form>
+
+        <form onSubmit={alerts.save}>
+          <SectionCard
+            id="alerts"
+            title="Feedback alerts"
+            description="Private messages from customers are forwarded to this WhatsApp number."
+            footer={<SaveFooter state={alerts.state} />}
+          >
+            <ErrorNote message={alerts.state.error} />
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label htmlFor="an" className="label">Name</label>
+                <input id="an" value={alerts.values.alertName} onChange={alerts.set('alertName')} className="input" placeholder="Store manager" />
+              </div>
+              <div>
+                <label htmlFor="am" className="label">WhatsApp number</label>
+                <PhoneInput id="am" required value={alerts.values.alertMobile} onChange={alerts.set('alertMobile')} />
+              </div>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button type="button" onClick={sendTest} disabled={test.state === 'sending' || !user.alertMobile} className="btn btn-secondary btn-sm">
+                {test.state === 'sending' && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Send a test message
+              </button>
+              <span className="text-[13px] text-ink-subtle">Sends to the saved number.</span>
+            </div>
+            {test.message && (
+              <p className={`mt-2 text-sm ${test.state === 'sent' ? 'text-emerald-800' : 'text-red-700'}`} role="status">{test.message}</p>
+            )}
+          </SectionCard>
+        </form>
+
+        <form onSubmit={account.save}>
+          <SectionCard id="account" title="Your account" footer={<SaveFooter state={account.state} />}>
+            <ErrorNote message={account.state.error} />
+            <div className="grid gap-5 md:grid-cols-3">
+              <div>
+                <label htmlFor="un" className="label">Your name</label>
+                <input id="un" required value={account.values.name} onChange={account.set('name')} className="input" />
+              </div>
+              <div>
+                <label htmlFor="ue" className="label">Email</label>
+                <input id="ue" value={user.email} disabled className="input" />
+              </div>
+              <div>
+                <label htmlFor="um" className="label">Mobile (for sign-in)</label>
+                <PhoneInput id="um" required value={account.values.mobile} onChange={account.set('mobile')} />
+              </div>
+            </div>
+          </SectionCard>
+        </form>
+
+        <SectionCard id="plan" title="Plan">
+          {planMsg && <div className="alert alert-success mb-4">{planMsg}</div>}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[15px] text-ink">
+                <span className="font-semibold">{PLAN_NAMES[user.plan] || user.plan}</span>
+                {', '}
+                {user.billingCycle === 'annual' ? 'billed yearly' : 'billed monthly'}
+              </p>
+              <p className="mt-1">
+                {user.planStatus === 'active' ? (
+                  <span className="badge badge-success">Active</span>
+                ) : (
+                  <span className="badge badge-warning">Not paid yet</span>
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {user.planStatus !== 'active' && (
+                <RazorpayCheckoutButton
+                  plan={user.plan}
+                  billingCycle={user.billingCycle}
+                  className="btn btn-primary btn-sm"
+                  onSuccess={(d) => {
+                    setPlanMsg(d.message || 'Payment received.');
+                    refresh();
+                  }}
+                >
+                  Pay and activate
+                </RazorpayCheckoutButton>
+              )}
+              <Link href="/pricing" className="btn btn-secondary btn-sm">Compare plans</Link>
             </div>
           </div>
-        </div>
+        </SectionCard>
       </div>
-    </div>
+    </>
   );
 }

@@ -10,7 +10,7 @@ export async function POST(request) {
   try {
     const { reviewId, customReply } = await request.json();
     const reviews = loadData('reviews.json', []);
-    const review = reviews.find(r => r.id === reviewId);
+    const review = reviews.find(r => r.id === reviewId && r.userId === user.id);
 
     if (!review) {
       return NextResponse.json({ error: 'Review not found.' }, { status: 404 });
