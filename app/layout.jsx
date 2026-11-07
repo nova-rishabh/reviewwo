@@ -1,6 +1,7 @@
 import './globals.css';
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://reviewwo.divergit.com'),
   title: 'Reviewwo — Autonomous Google Review Velocity Platform',
   description: 'Turn in-store foot traffic into 5-star Google reviews. 1-tap copy & Google Maps deep link, private negative review shield with instant manager WhatsApp alerts, and premium NFC acrylic standees.',
   icons: {

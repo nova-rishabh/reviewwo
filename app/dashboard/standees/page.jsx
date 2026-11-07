@@ -132,7 +132,7 @@ export default function StandeesPage() {
                 Laser-engraved acrylic block with embedded NTAG213 NFC microchip and high-contrast error-corrected QR matrix.
               </p>
               <div className="space-y-1 text-xs">
-                <p><strong>1-Tap Deep Link:</strong> <code className="text-[#14B8A6]">{selectedStandee?.qrUrl || 'https://reviewwo.com/RW101'}</code></p>
+                <p><strong>1-Tap Deep Link:</strong> <code className="text-[#14B8A6]">{selectedStandee?.qrUrl ? `https://reviewwo.divergit.com${selectedStandee.qrUrl}` : 'https://reviewwo.divergit.com/r/RW101'}</code></p>
                 <p><strong>Scans Captured:</strong> {selectedStandee?.scans || 0} customer taps</p>
               </div>
 
