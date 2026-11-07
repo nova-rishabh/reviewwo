@@ -8,8 +8,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
     super();
     this.sessionFile = path.resolve('data/whatsapp_session.json');
     this.logsFile = path.resolve('data/whatsapp_logs.json');
-    this.status = 'CONNECTED'; // 'DISCONNECTED' | 'QR_READY' | 'CONNECTING' | 'CONNECTED'
-    this.phoneNumber = '+919876543210';
+    this.status = 'DISCONNECTED'; // 'DISCONNECTED' | 'QR_READY' | 'CONNECTING' | 'CONNECTED'
+    this.phoneNumber = '';
     this.qrCode = null; // { raw: string, dataUrl: string }
     this.dispatches = [];
     
@@ -22,8 +22,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
       if (fs.existsSync(this.sessionFile)) {
         const raw = fs.readFileSync(this.sessionFile, 'utf8');
         const data = JSON.parse(raw);
-        this.status = data.status || 'CONNECTED';
-        this.phoneNumber = data.phoneNumber || '+919876543210';
+        this.status = data.status || 'DISCONNECTED';
+        this.phoneNumber = data.phoneNumber || '';
       }
     } catch (e) {
       this.status = 'DISCONNECTED';
@@ -37,9 +37,9 @@ class WhatsAppSocketAdapter extends EventEmitter {
         phoneNumber: this.phoneNumber,
         deviceName: "Reviewwo WhatsApp Gateway (Sovereign Socket)",
         connectedAt: new Date().toISOString(),
-        batteryLevel: 91,
-        totalDispatches: this.dispatches.length + 1420,
-        smsFeesSaved: `₹${(this.dispatches.length + 1420) * 2}`,
+        batteryLevel: 100,
+        totalDispatches: this.dispatches.length,
+        smsFeesSaved: `₹${this.dispatches.length * 2}`,
         mode: "sovereign_socket"
       };
       fs.writeFileSync(this.sessionFile, JSON.stringify(data, null, 2), 'utf8');
@@ -68,8 +68,8 @@ class WhatsAppSocketAdapter extends EventEmitter {
       phoneNumber: this.phoneNumber,
       deviceName: "Reviewwo WhatsApp Gateway (Sovereign Socket)",
       connected: this.status === 'CONNECTED',
-      totalDispatches: this.dispatches.length + 1420,
-      smsFeesSaved: `₹${(this.dispatches.length + 1420) * 2}`,
+      totalDispatches: this.dispatches.length,
+      smsFeesSaved: `₹${this.dispatches.length * 2}`,
       qrReady: this.status === 'QR_READY' && !!this.qrCode
     };
   }

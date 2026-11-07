@@ -22,7 +22,7 @@ export async function POST(request) {
       tableNumber: tableNumber ? tableNumber.trim() : '',
       format,
       shortCode,
-      qrUrl: `https://reviewwo.qr/${shortCode}`,
+      qrUrl: `/r/${shortCode}`,
       scans: 0,
       fiveStarReviewsGenerated: 0,
       createdAt: new Date().toISOString()

@@ -31,10 +31,10 @@ export default function DashboardOverviewPage() {
 
       setReviews(revs.slice(0, 5));
       setStats({
-        rating: reviewData.averageRating || '4.9',
+        rating: revs.length > 0 ? (reviewData.averageRating || '5.0') : '5.0',
         reviewCount: revs.length,
-        smsSaved: `₹${(revs.length * 2.5 + 450).toFixed(0)}`,
-        qrScans: totalScans || 284,
+        smsSaved: `₹${(revs.length * 2.5).toFixed(0)}`,
+        qrScans: totalScans,
         placeConnected: Boolean(userData?.user?.googlePlaceId),
         googlePlaceId: userData?.user?.googlePlaceId || ''
       });

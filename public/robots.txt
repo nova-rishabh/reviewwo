@@ -4,4 +4,4 @@ Disallow: /api/
 Disallow: /dashboard/
 Disallow: /dashboard/*
 
-Sitemap: https://reviewwoqr.com/sitemap.xml
+Sitemap: https://reviews.divergit.com/sitemap.xml

@@ -77,7 +77,7 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
+                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                   Your Full Name
                 </label>
                 <input
@@ -86,57 +86,57 @@ export default function RegisterPage() {
                   placeholder="e.g. Vikram Sharma"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
+                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
+                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                   Business / Store Name
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Royal Bengal Bistro"
+                  placeholder="e.g. Divergit, Blue Tokai, Apollo Clinic"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
+                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
+                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                   Work Email Address
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="vikram@example.com"
+                  placeholder="name@business.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
+                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
+                <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                   WhatsApp Number (for Grievance Alerts)
                 </label>
                 <input
                   type="tel"
                   required
-                  placeholder="+91 9876543210"
+                  placeholder="+91 98765 43210"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
+                  className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0B3D3B] mb-1">
+              <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                 Create Strong Password
               </label>
               <input
@@ -145,13 +145,13 @@ export default function RegisterPage() {
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:outline-none focus:border-[#14B8A6]"
+                className="h-12 w-full text-sm font-medium px-4 rounded-xl border border-[#0B3D3B]/20 bg-[#F8FFFE] focus:bg-white focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition-all text-[#0B3D3B]"
               />
             </div>
 
             {/* Plan Selector */}
             <div>
-              <label className="block text-xs font-bold text-[#0B3D3B] mb-2">
+              <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-2">
                 Choose Subscription Plan
               </label>
               <div className="grid grid-cols-3 gap-3">
@@ -180,7 +180,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow-md mt-2"
+              className="h-12 w-full bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-sm font-display font-bold rounded-xl transition-all shadow-md mt-4 flex items-center justify-center gap-2"
             >
               {loading ? 'Creating Account...' : 'Complete Enterprise Registration →'}
             </button>

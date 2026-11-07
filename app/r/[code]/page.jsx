@@ -8,11 +8,12 @@ export default function ReviewTapPage({ params }) {
   const code = unwrappedParams.code || 'RW101';
 
   const [business, setBusiness] = useState({
-    name: 'Royal Bengal Bistro & Lounge',
-    city: 'Connaught Place, New Delhi',
-    placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
-    rating: 4.9,
-    totalReviews: 842
+    name: 'Reviewwo Partner Store',
+    city: 'Verified Location',
+    placeId: '',
+    rating: 5.0,
+    totalReviews: 0,
+    tableNumber: ''
   });
 
   const [rating, setRating] = useState(5);
@@ -23,6 +24,24 @@ export default function ReviewTapPage({ params }) {
   const [shieldFeedback, setShieldFeedback] = useState('');
   const [guestName, setGuestName] = useState('');
   const [submittingShield, setSubmittingShield] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/standees/resolve?code=${encodeURIComponent(code)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.business) {
+          setBusiness({
+            name: data.business.name || 'Reviewwo Partner Store',
+            city: data.business.city || 'Verified Location',
+            placeId: data.business.placeId || '',
+            rating: data.business.rating || 5.0,
+            totalReviews: data.business.totalReviews || 0,
+            tableNumber: data.business.tableNumber || ''
+          });
+        }
+      })
+      .catch(() => {});
+  }, [code]);
 
   const tags = [
     'Attentive Hospitality',
@@ -88,7 +107,9 @@ export default function ReviewTapPage({ params }) {
 
     // Deep-link to Google Maps Write Review dialogue
     setTimeout(() => {
-      const googleUrl = `https://search.google.com/local/writereview?placeid=${business.placeId}`;
+      const googleUrl = business.placeId
+        ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(business.placeId)}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name)}`;
       window.open(googleUrl, '_blank');
     }, 500);
 
@@ -287,9 +308,9 @@ export default function ReviewTapPage({ params }) {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmitShield} className="space-y-3">
+              <form onSubmit={handleSubmitShield} className="space-y-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#0B3D3B] mb-1">
+                  <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                     What fell short today?
                   </label>
                   <textarea
@@ -298,12 +319,12 @@ export default function ReviewTapPage({ params }) {
                     placeholder="Tell us what went wrong (slow service, food quality, temperature, etc.)..."
                     value={shieldFeedback}
                     onChange={(e) => setShieldFeedback(e.target.value)}
-                    className="w-full text-xs p-3 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:outline-none focus:border-[#EF4444]"
+                    className="w-full text-xs p-3 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:bg-white focus:outline-none focus:border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20 transition-all text-[#0B3D3B]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-[#0B3D3B] mb-1">
+                  <label className="block text-xs font-display font-bold text-[#0B3D3B] mb-1.5">
                     Your Name or Phone (Optional, for resolution)
                   </label>
                   <input
@@ -311,14 +332,14 @@ export default function ReviewTapPage({ params }) {
                     placeholder="e.g. John • +91 98765 43210"
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:outline-none focus:border-[#EF4444]"
+                    className="h-12 w-full text-sm font-medium px-4 rounded-xl bg-[#F8FFFE] border border-[#0B3D3B]/20 focus:bg-white focus:outline-none focus:border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20 transition-all text-[#0B3D3B]"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submittingShield}
-                  className="w-full py-3 px-4 bg-[#0B3D3B] hover:bg-[#DC2626] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
+                  className="h-12 w-full bg-[#0B3D3B] hover:bg-[#DC2626] text-white text-xs font-display font-bold rounded-xl transition-all shadow flex items-center justify-center gap-2"
                 >
                   {submittingShield ? 'Sending to Manager...' : 'Alert Store Manager on WhatsApp →'}
                 </button>

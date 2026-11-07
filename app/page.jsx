@@ -6,10 +6,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function HomePage() {
-  const [bizName, setBizName] = useState('Urban Bistro');
+  const [bizName, setBizName] = useState('Your Business');
   const [selectedTag, setSelectedTag] = useState('Delicious Food & Fast Service');
   const [generatedDraft, setGeneratedDraft] = useState(
-    'Had an incredible experience at Urban Bistro! The Delicious Food & Fast Service was top-notch. Staff was super polite. 5 stars all the way!'
+    'Had an incredible experience at Your Business! The Delicious Food & Fast Service was top-notch. Staff was super polite. 5 stars all the way!'
   );
   const [copied, setCopied] = useState(false);
   const [simulatedRating, setSimulatedRating] = useState(5);
@@ -144,6 +144,7 @@ export default function HomePage() {
                       <input
                         type="text"
                         value={bizName}
+                        placeholder="e.g. Divergit, Blue Tokai, Apollo Clinic"
                         onChange={(e) => {
                           setBizName(e.target.value);
                           handleGenerate(selectedTag);

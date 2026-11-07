@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import RazorpayCheckoutButton from '../../components/RazorpayCheckoutButton';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'annual'
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(d => {
+        if (d && d.authenticated) setIsAuthenticated(true);
+      })
+      .catch(() => {});
+  }, []);
 
   const plans = [
     {
@@ -157,16 +168,30 @@ export default function PricingPage() {
                   </div>
 
                   <div className="pt-8">
-                    <Link
-                      href={`/register?plan=${p.id}`}
-                      className={`w-full py-3.5 px-4 rounded-xl text-xs font-display font-bold text-center block shadow transition-all ${
-                        p.popular
-                          ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white'
-                          : 'bg-[#E6FFFB] hover:bg-[#14B8A6] hover:text-white text-[#0B3D3B] border border-[#14B8A6]/30'
-                      }`}
-                    >
-                      {p.ctaText}
-                    </Link>
+                    {isAuthenticated ? (
+                      <RazorpayCheckoutButton
+                        plan={p.id}
+                        billingCycle={billingCycle}
+                        className={`w-full py-3.5 px-4 rounded-xl text-xs font-display font-bold text-center block shadow transition-all ${
+                          p.popular
+                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white'
+                            : 'bg-[#E6FFFB] hover:bg-[#14B8A6] hover:text-white text-[#0B3D3B] border border-[#14B8A6]/30'
+                        }`}
+                      >
+                        Subscribe with Razorpay →
+                      </RazorpayCheckoutButton>
+                    ) : (
+                      <Link
+                        href={`/register?plan=${p.id}&billing=${billingCycle}`}
+                        className={`w-full py-3.5 px-4 rounded-xl text-xs font-display font-bold text-center block shadow transition-all ${
+                          p.popular
+                            ? 'bg-[#0B3D3B] hover:bg-[#14B8A6] text-white'
+                            : 'bg-[#E6FFFB] hover:bg-[#14B8A6] hover:text-white text-[#0B3D3B] border border-[#14B8A6]/30'
+                        }`}
+                      >
+                        {p.ctaText}
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

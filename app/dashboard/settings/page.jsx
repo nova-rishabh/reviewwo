@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DashboardHeader from '../../../components/DashboardHeader';
+import RazorpayCheckoutButton from '../../../components/RazorpayCheckoutButton';
 
 export default function SettingsPage() {
   const [user, setUser] = useState({
@@ -178,12 +179,25 @@ export default function SettingsPage() {
                 Includes 1-Tap Google Review Deep-Linking, Smart Negative Feedback Shield with Manager WhatsApp Alerts, and AI Autopilot Replies.
               </p>
             </div>
-            <a
-              href="/pricing"
-              className="px-4 py-2.5 bg-[#14B8A6] hover:bg-[#0B3D3B] text-white text-xs font-display font-bold rounded-xl transition-all shadow shrink-0"
-            >
-              Upgrade / Modify Plan →
-            </a>
+            <div className="flex items-center gap-3 shrink-0">
+              <RazorpayCheckoutButton
+                plan={user.plan || 'growth'}
+                billingCycle="monthly"
+                className="px-4 py-2.5 bg-[#0B3D3B] hover:bg-[#14B8A6] text-white text-xs font-display font-bold rounded-xl transition-all shadow"
+                onSuccess={(data) => {
+                  setMessage('🎉 Subscription activated successfully via Razorpay!');
+                  fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setUser(d.user); });
+                }}
+              >
+                Pay via Razorpay →
+              </RazorpayCheckoutButton>
+              <a
+                href="/pricing"
+                className="px-4 py-2.5 bg-[#E6FFFB] border border-[#14B8A6]/40 text-[#0B3D3B] hover:bg-[#14B8A6] hover:text-white text-xs font-display font-bold rounded-xl transition-all shadow"
+              >
+                Change Plan →
+              </a>
+            </div>
           </div>
         </div>
       </div>
