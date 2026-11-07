@@ -49,7 +49,7 @@ export const PLAN_PRICING = {
     locations: 3
   },
   agency: {
-    name: 'Agency Partner',
+    name: 'Agency',
     monthlyPrice: 799,
     annualPrice: 7668, // ₹639/mo * 12
     standeesLimit: 25,

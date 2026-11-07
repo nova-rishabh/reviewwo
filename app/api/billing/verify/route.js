@@ -6,9 +6,12 @@ export async function POST(request) {
   const user = currentUserRecord(request);
   if (!user) return NextResponse.json({ error: 'Sign in again to finish your payment.' }, { status: 401 });
 
+  let orderId;
+  let paymentId;
+  let signature;
   try {
-    const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } =
-      await request.json();
+    ({ razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } =
+      await request.json());
 
     if (!orderId || !paymentId || !signature) {
       return NextResponse.json({ error: 'Payment details are missing.' }, { status: 400 });
@@ -60,6 +63,12 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true, message: `You’re now on the ${plan.name} plan.` });
   } catch (err) {
-    return NextResponse.json({ error: 'We could not confirm your payment. Contact us if you were charged.' }, { status: 500 });
+    // Log enough to reconcile by hand; the payment ID lets the customer prove the charge.
+    console.error('Payment verification failed', { orderId, paymentId, error: err?.message });
+    const ref = paymentId ? ` Keep this payment ID for your records: ${paymentId}.` : '';
+    return NextResponse.json(
+      { error: `We couldn’t confirm your payment. Razorpay has a record of it linked to your account.${ref}` },
+      { status: 500 }
+    );
   }
 }

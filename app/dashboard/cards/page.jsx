@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { ExternalLink, Loader2, Copy, Check } from 'lucide-react';
 import { PageHeader, useDashboardUser } from '../../../components/DashboardShell';
 import { apiGet, apiPost, downloadDataUrl, downloadText } from '../../../components/api';
@@ -192,6 +193,7 @@ export default function CardsPage() {
   };
 
   const selected = (cards || []).find((c) => c.id === selectedId);
+  const atLimit = cards !== null && cards.length >= user.cardLimit;
 
   return (
     <>
@@ -204,7 +206,14 @@ export default function CardsPage() {
       <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
         <div className="space-y-4">
           <form onSubmit={create} className="card p-4">
-            <label htmlFor="new-card" className="label">New card</label>
+            <div className="mb-1.5 flex items-baseline justify-between">
+              <label htmlFor="new-card" className="text-sm font-medium text-ink">New card</label>
+              {cards !== null && (
+                <span className="text-[13px] tabular-nums text-ink-subtle">
+                  {cards.length} of {user.cardLimit} used
+                </span>
+              )}
+            </div>
             <div className="flex gap-2">
               <input
                 id="new-card"
@@ -213,11 +222,18 @@ export default function CardsPage() {
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Table 4"
                 className="input"
+                disabled={atLimit}
               />
-              <button type="submit" disabled={creating} className="btn btn-primary shrink-0">
+              <button type="submit" disabled={creating || atLimit} className="btn btn-primary shrink-0">
                 {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add'}
               </button>
             </div>
+            {atLimit && (
+              <p className="mt-2 text-[13px] text-ink-muted">
+                You’ve used all the cards on your plan.{' '}
+                <Link href="/pricing" className="link">Compare plans</Link>
+              </p>
+            )}
           </form>
 
           <div className="card">

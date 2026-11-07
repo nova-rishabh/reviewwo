@@ -17,7 +17,7 @@ export async function POST(request) {
     const razorpay = getRazorpayClient();
     if (!razorpay) {
       return NextResponse.json(
-        { error: 'Online payments are not set up yet. Please contact us to subscribe.', requiresKeys: true },
+        { error: 'Online payments aren’t available yet. Your account works in the meantime; try subscribing again later.', requiresKeys: true },
         { status: 503 }
       );
     }

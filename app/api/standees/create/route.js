@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { loadData, saveData, authenticateRequest } from '../../../../src/lib/store.js';
+import { loadData, saveData, currentUserRecord } from '../../../../src/lib/store.js';
+import { PLAN_PRICING } from '../../../../src/lib/razorpay.js';
 import { withQr, newShortCode } from '../../../../src/lib/cards.js';
 
 export async function POST(request) {
-  const session = authenticateRequest(request);
+  const session = currentUserRecord(request);
   if (!session) return NextResponse.json({ error: 'Sign in again to continue.' }, { status: 401 });
 
   try {
@@ -12,6 +13,14 @@ export async function POST(request) {
     if (!name) return NextResponse.json({ error: 'Give the card a name, such as “Front counter”.' }, { status: 400 });
 
     const cards = loadData('standees.json', []);
+    const plan = PLAN_PRICING[session.plan] || PLAN_PRICING.starter;
+    const owned = cards.filter((c) => c.userId === session.id).length;
+    if (owned >= plan.standeesLimit) {
+      return NextResponse.json(
+        { error: `Your ${plan.name} plan includes ${plan.standeesLimit} card${plan.standeesLimit === 1 ? '' : 's'}. Upgrade your plan to add more.`, limitReached: true },
+        { status: 403 }
+      );
+    }
     const codes = new Set(cards.map((c) => String(c.shortCode || '').toLowerCase()));
     const base = {
       id: `card_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,

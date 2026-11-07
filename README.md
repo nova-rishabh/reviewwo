@@ -1,62 +1,56 @@
-# Reviewwo — Enterprise Google Review Acceleration Platform
+# Reviewwo
 
-A production-grade, deploy-ready **Next.js (App Router)** SaaS platform engineered to clone the capabilities of automated Google review acceleration platforms — built from scratch with an original design, custom King Rounded typography, bespoke branding, and zero references or cloned markup from any third party.
+NFC review cards for local businesses. A customer taps the card (or scans its QR code), rates their visit, and can post a Google review in a few taps. Anyone can also send a private message to the manager, which is forwarded to the manager's WhatsApp.
 
----
+Live site: https://reviewwo.divergit.com
 
-## 🎨 Brand Design System & Custom Typography
+## How it works
 
-- **Brand Name**: **Reviewwo**
-- **Headline & Brand Font**: **King Rounded** (Custom OTF font family: Regular, Extrabold, Extra-light)
-- **Body Font**: **Inter** (Clean neutral editorial sans)
-- **Strict 5-Color Palette**:
+- **Customer page** (`/r/<code>`): business name, a star rating, optional prompts for what to write, and a button that copies the text and opens the business's Google review form. Every customer is offered Google. People who rate 1 to 3 stars are also invited to message the manager first; that message is clearly labelled as private.
+- **Feedback alerts**: private messages are saved to the business's feedback inbox and sent to the alert number on WhatsApp through one shared sender number that an admin links.
+- **Dashboard**: overview, feedback inbox (resolve and reopen), cards (create, rename, remove, PNG and SVG QR downloads, scan counts) and settings.
+- **Onboarding**: after sign-up, four steps collect the business details, Google Place ID, alert number and first card.
 
-| Token | Hex Value | Role & Implementation |
-|---|---|---|
-| **Primary** | `#0B3D3B` | Deep Forest Emerald Teal — Headings, high-contrast buttons, dark container headers, primary text contrast. |
-| **Accent** | `#14B8A6` | Vibrant Luminous Teal — Primary CTA gradients, active states, glowing badges, checkmarks, progress indicators. |
-| **Secondary** | `#99F6E4` | Soft Mint / Aqua Pastel — Card highlight borders, secondary badges, subtle glow accents. |
-| **Surface** | `#E6FFFB` | Ice Mint / Clean Surface — Card container tints, subtle badge backdrops, table headers, hover highlights. |
-| **Background** | `#F8FFFE` | Crisp Mint-White — Pristine, modern base page background across all pages. |
+## Running locally
 
----
+```bash
+npm install
+```
 
-## ⚡ The Frictionless 1-Tap In-Store Review Flow
+```bash
+npm run dev
+```
 
-1. **Guest Taps NFC Standee or Scans QR**: Launches in 0.2s without downloading any app or entering personal information.
-2. **AI Generates Tailored 5-Star Draft**: Guest chooses highlights ("Crispy Fries", "Great Hospitality", "Fast Service").
-3. **1-Tap Copy & Deep-Link**: 
-   - Copies the drafted 5-star review directly to their device clipboard.
-   - Automatically opens the store's verified Google Maps review dialogue (`https://search.google.com/local/writereview?placeid=...`).
-   - Customer simply pastes and taps "Post" — complete in 12 seconds!
+The app runs on http://localhost:3000. Data is stored as JSON files in `data/` (or `DATA_DIR`).
 
----
+## Environment variables
 
-## 💬 The Two Exclusive Roles of the WhatsApp Socket
+See `.env.example`.
 
-Reviewwo does **not** blast cold outbound marketing messages or chat drafts to customers. The sovereign multi-device WhatsApp socket is reserved exclusively for:
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `JWT_SECRET` | Production | Signs sign-in cookies. Sign-in fails without it in production. |
+| `APP_URL` | Yes | Public URL used in card links and QR codes. Changing it breaks cards that are already printed. |
+| `ADMIN_EMAILS` | Yes | Comma-separated emails that can see the WhatsApp sender page. |
+| `DATA_DIR` | Production | Folder on a persistent disk for JSON data and the WhatsApp session. |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | For payments | Without them, subscribing shows a "payments aren't available yet" message. |
 
-1. **Negative Review Shield Manager Alerts (1–3★ Deflection)**:
-   - When a dissatisfied guest rates 1 to 3 stars on a counter standee, the feedback is intercepted privately and prevented from reaching Google.
-   - The WhatsApp socket immediately triggers an automated high-priority alert to the **store manager’s personal phone**:  
-     `"⚠️ Reviewwo Alert: Guest at Table 4 rated 2 stars. Feedback: 'Order took 25 mins'. Tap here to resolve privately before they leave."`
-2. **Merchant Authentication (WhatsApp OTP)**:
-   - Merchants sign in securely with 6-digit one-time passwords delivered via their connected WhatsApp socket with **₹0 SMS fees**.
+## Plans
 
----
+Card limits are enforced when a card is created and must stay in sync in three places: `CARD_LIMITS` in `src/lib/store.js`, `PLAN_PRICING` in `src/lib/razorpay.js`, and the pricing page.
 
-## 🚀 Clean Production Routes (Zero `.html`)
+| Plan | Monthly | Yearly (per month) | Cards |
+| --- | --- | --- | --- |
+| Starter | ₹149 | ₹119 | 1 |
+| Growth | ₹299 | ₹239 | 5 |
+| Agency | ₹799 | ₹639 | 25 |
 
-- `/` — Modern Beehiiv-style landing page with live 1-tap review simulator and flywheel breakdown.
-- `/features` — Feature breakdown: 1-Tap Google Deep-Link, Manager WhatsApp Rail, Negative Shield, and 24/7 Autopilot.
-- `/pricing` — Starter (₹149/mo), Growth (₹299/mo), Agency (₹799/mo).
-- `/standees` — Standee Hardware Studio: 7x5" Acrylic standees, 5x4" Table wedges, and NFC pucks.
-- `/agency` — White-label reseller hub, 95%+ margin model, multi-tenant sub-accounts.
-- `/login` — Enterprise sign-in with King Rounded typography: Email/Password & WhatsApp OTP tabs.
-- `/register` — Account registration with business category and subscription plan selector.
-- `/dashboard` — Executive overview, real Google Place ID sync status, scan velocity.
-- `/dashboard/whatsapp` — Dedicated Manager WhatsApp Rail & Auth Gateway.
-- `/dashboard/reviews` — Google Reviews management & 24/7 AI Autopilot auto-response engine.
-- `/dashboard/standees` — Smart standees studio, shortcode generator, and vector SVG downloads.
-- `/dashboard/shield` — Negative feedback shield logs and internal manager resolution workflow.
-- `/dashboard/settings` — Business profile settings, Google Place ID linkage, and subscription tier switch.
+## WhatsApp
+
+Alerts and sign-in codes are sent with Baileys, an unofficial WhatsApp Web client. One sender number serves every business. An admin links it from **Dashboard → WhatsApp sender**. Merchants only provide the number that receives alerts. WhatsApp can restrict numbers used this way, so the dashboard shows when the sender is offline and feedback is still saved to the inbox.
+
+## Known gaps
+
+- Google reviews are not imported, and replies are not posted to Google.
+- Each business needs its own account; there is no multi-client agency login.
+- Data is stored in JSON files, so the app runs on a single server.

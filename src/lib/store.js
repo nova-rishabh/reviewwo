@@ -141,6 +141,7 @@ export function publicUser(u) {
     planStatus: u.planStatus || 'unpaid',
     billingCycle: u.billingCycle || 'monthly',
     // Accounts created before onboarding existed count as onboarded if they have a Google listing.
+    cardLimit: CARD_LIMITS[u.plan] || CARD_LIMITS.starter,
     onboardingComplete: u.onboardingComplete === true || (u.onboardingComplete === undefined && Boolean(u.googlePlaceId)),
     isAdmin: isAdminEmail(u.email),
   };
@@ -177,6 +178,9 @@ export function isValidPlaceId(value) {
 }
 
 export const PLAN_IDS = ['starter', 'growth', 'agency'];
+
+/** Cards allowed per plan. Keep in sync with PLAN_PRICING in razorpay.js and the pricing page. */
+export const CARD_LIMITS = { starter: 1, growth: 5, agency: 25 };
 
 /** Returns the signed-in admin's record, or null when the caller is not an admin. */
 export function currentAdmin(request) {

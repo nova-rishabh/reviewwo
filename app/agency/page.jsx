@@ -4,13 +4,13 @@ import Footer from '../../components/Footer';
 
 export const metadata = {
   title: 'For agencies | Reviewwo',
-  description: 'Offer NFC review cards to your local clients. The Agency plan covers up to 25 locations for ₹799 a month.',
+  description: 'Offer NFC review cards to the local businesses you work with. Each client gets their own Reviewwo account.',
 };
 
 const points = [
-  ['Up to 25 locations', 'Set up review pages and cards for your clients from one plan, for ₹799 a month.'],
-  ['Cards in bulk', 'Order NFC cards in volume at a lower price per card and include them in your local marketing packages.'],
-  ['Help getting started', 'We help you set up your first few clients so their cards are on the counter quickly.'],
+  ['One account per client', 'Each business gets its own Reviewwo account, so its cards, feedback and alerts stay separate from your other clients.'],
+  ['You can set it up for them', 'Go through the four-step setup on your client’s behalf: business details, Google listing, alert number and first card.'],
+  ['Pick the plan that fits', 'Starter covers one card. Growth and Agency cover up to 5 and 25 cards for venues with many tables or rooms.'],
 ];
 
 export default function AgencyPage() {
@@ -25,8 +25,8 @@ export default function AgencyPage() {
             reviews and catch complaints early.
           </p>
           <div className="mt-8">
-            <Link href="/register?plan=agency" className="btn btn-primary btn-lg">
-              Start on the Agency plan
+            <Link href="/register" className="btn btn-primary btn-lg">
+              Set up a client
             </Link>
           </div>
         </section>
