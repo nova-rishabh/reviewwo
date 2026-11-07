@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Overview — Reviewwo QR Console</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar">
+    <div class="dash-brand">
+      <a href="../index.html"><img src="../assets/img/logo.svg" alt="Reviewwo QR"></a>
+    </div>
+
+    <nav class="dash-nav">
+      <span class="dash-nav-section-label">Main Console</span>
+      <a href="index.html" class="dash-nav-link active"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+      <a href="reviews.html" class="dash-nav-link"><i class="fa-solid fa-star"></i> Reviews & Autopilot</a>
+      <a href="standees.html" class="dash-nav-link"><i class="fa-solid fa-qrcode"></i> Standees & QR Codes</a>
+      <a href="shield-logs.html" class="dash-nav-link"><i class="fa-solid fa-shield-halved"></i> Private Shield Logs</a>
+
+      <span class="dash-nav-section-label">Integrations</span>
+      <a href="whatsapp-gateway.html" class="dash-nav-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp Gateway</a>
+      <a href="settings.html" class="dash-nav-link"><i class="fa-solid fa-gear"></i> Settings & Billing</a>
+    </nav>
+
+    <div class="dash-sidebar-footer">
+      <div class="dash-user-row">
+        <div class="dash-user-avatar" id="dash-avatar">CV</div>
+        <div class="dash-user-info">
+          <div class="dash-user-name" id="dash-username">Café Verona</div>
+          <div class="dash-user-plan" id="dash-userplan">Growth Plan (₹299/mo)</div>
+        </div>
+      </div>
+      <button onclick="handleSignOut()" style="margin-top: 10px; width: 100%; background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 7px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="dash-main">
+    <header class="dash-header">
+      <div class="dash-header-title">
+        <span>Executive Dashboard</span>
+      </div>
+
+      <div class="dash-header-actions">
+        <a href="whatsapp-gateway.html" class="wa-status-badge" id="wa-live-status-pill">
+          <span class="wa-pulse-dot"></span> Socket Connected (+919876543210)
+        </a>
+        <a href="standees.html" class="btn-primary"><i class="fa-solid fa-plus"></i> New Standee</a>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      
+      <!-- Stat Cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Google Maps Rating</span>
+            <div class="stat-card-icon"><i class="fa-solid fa-star" style="color: #F59E0B;"></i></div>
+          </div>
+          <div class="stat-card-val">4.9 ★</div>
+          <div class="stat-card-sub"><i class="fa-solid fa-arrow-up"></i> +0.4 since deployment</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Total Verified Reviews</span>
+            <div class="stat-card-icon"><i class="fa-solid fa-comment-dots"></i></div>
+          </div>
+          <div class="stat-card-val">384</div>
+          <div class="stat-card-sub"><i class="fa-solid fa-arrow-up"></i> +42 this month</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Standee Scans (30 Days)</span>
+            <div class="stat-card-icon"><i class="fa-solid fa-qrcode"></i></div>
+          </div>
+          <div class="stat-card-val">1,842</div>
+          <div class="stat-card-sub"><i class="fa-solid fa-bullseye"></i> 85.2% review conversion</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Grievances Shielded</span>
+            <div class="stat-card-icon"><i class="fa-solid fa-shield-halved" style="color: #10B981;"></i></div>
+          </div>
+          <div class="stat-card-val">24</div>
+          <div class="stat-card-sub"><i class="fa-solid fa-check"></i> 100% saved from Google</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-title">WhatsApp SMS Fees Saved</span>
+            <div class="stat-card-icon"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i></div>
+          </div>
+          <div class="stat-card-val">₹2,840</div>
+          <div class="stat-card-sub">₹0 SMS costs forever</div>
+        </div>
+      </div>
+
+      <!-- Live Review Autopilot Stream -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><i class="fa-brands fa-google" style="color: #14B8A6; margin-right: 8px;"></i> Recent Google Reviews & 24/7 Autopilot Replies</h3>
+          <a href="reviews.html" class="btn-outline">View All Reviews &rarr;</a>
+        </div>
+        <div class="panel-body">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            
+            <div style="background: #FAFCFC; border: 1px solid var(--color-border); border-radius: 12px; padding: 20px;" id="review-card-rev_001">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <strong style="color: var(--color-primary); font-size: 14px;">Ananya Roy</strong>
+                  <span style="color: #F59E0B; font-size: 12px;">★★★★★</span>
+                  <span style="background: var(--color-surface); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">Verified Customer</span>
+                </div>
+                <span style="font-size: 12px; color: var(--color-text-muted);">Yesterday via Google Maps</span>
+              </div>
+              <p style="font-size: 13.5px; color: var(--color-text); margin-bottom: 12px; line-height: 1.5;">
+                "Visited Café Verona yesterday evening. The Truffle Mushroom Pasta was sensational and the cold brew was super fresh! Staff was prompt and very polite. Will definitely visit again!"
+              </p>
+              
+              <div class="review-reply-display">
+                <div style="background: var(--color-surface); border-left: 3px solid var(--color-accent); padding: 12px 16px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--color-primary); text-transform: uppercase;">
+                      <i class="fa-solid fa-robot" style="color: var(--color-accent);"></i> Official Owner Reply (Google API Synced)
+                    </span>
+                    <span style="font-size: 11px; color: #10B981; font-weight: 700;">Posted in 48s</span>
+                  </div>
+                  <p style="font-size: 13px; color: var(--color-text); margin: 0;">
+                    "Thank you so much Ananya! We are delighted that you loved our signature Truffle Mushroom Pasta. Looking forward to hosting you again soon! — Team Café Verona"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style="background: #FAFCFC; border: 1px solid var(--color-border); border-radius: 12px; padding: 20px;" id="review-card-rev_002">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <strong style="color: var(--color-primary); font-size: 14px;">Vikram Sethi</strong>
+                  <span style="color: #F59E0B; font-size: 12px;">★★★★★</span>
+                </div>
+                <span style="font-size: 12px; color: var(--color-text-muted);">2 days ago via Google Maps</span>
+              </div>
+              <p style="font-size: 13.5px; color: var(--color-text); margin-bottom: 12px; line-height: 1.5;">
+                "Best Italian cafe in Indiranagar! Woodfired Margherita pizza was authentic with crisp crust. 10/10 dining experience."
+              </p>
+              
+              <div class="review-reply-display">
+                <div style="background: var(--color-surface); border-left: 3px solid var(--color-accent); padding: 12px 16px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--color-primary); text-transform: uppercase;">
+                      <i class="fa-solid fa-robot" style="color: var(--color-accent);"></i> Official Owner Reply (Google API Synced)
+                    </span>
+                    <span style="font-size: 11px; color: #10B981; font-weight: 700;">Posted in 32s</span>
+                  </div>
+                  <p style="font-size: 13px; color: var(--color-text); margin: 0;">
+                    "Hi Vikram, thanks a lot for the wonderful review! So glad you enjoyed the woodfired crust. See you again next weekend!"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>

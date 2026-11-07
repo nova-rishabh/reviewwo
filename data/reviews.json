@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rev_001",
+    "author": "Ananya Roy",
+    "rating": 5,
+    "date": "2026-11-06T18:42:00.000Z",
+    "text": "Visited Café Verona yesterday evening. The Truffle Mushroom Pasta was sensational and the cold brew was super fresh! Staff was prompt and very polite. Will definitely visit again!",
+    "tags": ["Truffle Pasta", "Cold Brew", "Prompt Staff"],
+    "reply": "Thank you so much Ananya! We are delighted that you loved our signature Truffle Mushroom Pasta. Looking forward to hosting you again soon! — Team Café Verona",
+    "repliedAt": "2026-11-06T18:43:12.000Z",
+    "replyStatus": "autopilot_sent",
+    "source": "Google Maps"
+  },
+  {
+    "id": "rev_002",
+    "author": "Vikram Sethi",
+    "rating": 5,
+    "date": "2026-11-05T14:15:00.000Z",
+    "text": "Best Italian cafe in Indiranagar! Woodfired Margherita pizza was authentic with crisp crust. 10/10 dining experience.",
+    "tags": ["Woodfired Pizza", "Great Ambiance"],
+    "reply": "Hi Vikram, thanks a lot for the wonderful review! So glad you enjoyed the woodfired crust. See you again next weekend!",
+    "repliedAt": "2026-11-05T14:16:05.000Z",
+    "replyStatus": "autopilot_sent",
+    "source": "Google Maps"
+  },
+  {
+    "id": "rev_003",
+    "author": "Pooja Hegde",
+    "rating": 5,
+    "date": "2026-11-04T20:30:00.000Z",
+    "text": "Staff is remarkably courteous. Ambience is peaceful with great background music. Loved their tiramisu!",
+    "tags": ["Courteous Staff", "Tiramisu", "Music"],
+    "reply": "Thank you Pooja! Our pastry chef will be thrilled to hear your praise for the tiramisu. Cheers!",
+    "repliedAt": "2026-11-04T20:31:00.000Z",
+    "replyStatus": "autopilot_sent",
+    "source": "Google Maps"
+  }
+]

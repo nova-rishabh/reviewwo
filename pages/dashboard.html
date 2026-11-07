@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Console — Reviewwo QR</title>
+  <meta name="description" content="Reviewwo QR Enterprise Admin Console: Review Analytics, Smart Standee Management, AI Autopilot Reply, and Self-Hosted WhatsApp Negative Shield.">
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body style="background: #F8FFFE; margin: 0; font-family: 'Inter', sans-serif; color: #234745;">
+
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-sidebar-header">
+        <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+          <img src="../assets/img/logo-light.svg" alt="Reviewwo QR" style="height: 30px;">
+        </a>
+      </div>
+
+      <div class="dashboard-sidebar-nav">
+        <button class="dash-nav-link active" data-tab="overview">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Overview</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="whatsapp">
+          <i class="fa-brands fa-whatsapp" style="color: #34D399;"></i>
+          <span>WhatsApp Shield</span>
+          <span class="dash-nav-badge live">Socket</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="standees">
+          <i class="fa-solid fa-qrcode"></i>
+          <span>Smart Standees</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="autopilot">
+          <i class="fa-solid fa-robot"></i>
+          <span>AI Autopilot Reply</span>
+          <span class="dash-nav-badge">Live</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="reviews">
+          <i class="fa-solid fa-star" style="color: #F59E0B;"></i>
+          <span>Google Reviews</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="locations">
+          <i class="fa-solid fa-store"></i>
+          <span>Locations</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="billing">
+          <i class="fa-solid fa-credit-card"></i>
+          <span>Plan & Billing</span>
+        </button>
+
+        <button class="dash-nav-link" data-tab="settings">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+
+      <div class="dashboard-sidebar-footer">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: #14B8A6; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;">
+            CV
+          </div>
+          <div style="overflow: hidden;">
+            <div style="font-size: 13px; font-weight: 700; color: #FFFFFF; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Café Verona</div>
+            <div style="font-size: 11px; color: #99F6E4;">Growth Plan (₹299/mo)</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main-content">
+      
+      <!-- Top Bar -->
+      <header class="dashboard-topbar">
+        <div class="dashboard-topbar-title">
+          <span id="dash-current-title">Console Overview</span>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #065F46; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 4px 12px; border-radius: 99px;">
+            <span style="width: 7px; height: 7px; background: #10B981; border-radius: 50%; box-shadow: 0 0 6px #10B981;"></span>
+            WhatsApp Socket Connected
+          </div>
+          <a href="../index.html" class="btn btn-sm btn-secondary" style="font-size: 12px;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> View Storefront
+          </a>
+        </div>
+      </header>
+
+      <div class="dashboard-page-container">
+        
+        <!-- TAB 1: OVERVIEW -->
+        <section id="pane-overview" class="dash-tab-pane active">
+          
+          <!-- Metric Grid -->
+          <div class="console-metric-grid" style="margin-bottom: 24px;">
+            <div class="console-stat-box">
+              <div style="font-size: 11px; color: #4A706E; font-weight: 700; text-transform: uppercase;">Total QR Scans</div>
+              <div class="console-stat-val">1,842</div>
+              <div class="console-stat-sub"><i class="fa-solid fa-arrow-up"></i> +32% this month</div>
+            </div>
+
+            <div class="console-stat-box">
+              <div style="font-size: 11px; color: #4A706E; font-weight: 700; text-transform: uppercase;">Verified 5-Stars</div>
+              <div class="console-stat-val" style="color: #10B981;">1,568</div>
+              <div class="console-stat-sub">85.2% Scan Completion</div>
+            </div>
+
+            <div class="console-stat-box">
+              <div style="font-size: 11px; color: #4A706E; font-weight: 700; text-transform: uppercase;">Shielded Bad Reviews</div>
+              <div class="console-stat-val" style="color: #0B3D3B;">24</div>
+              <div class="console-stat-sub" style="color: #065F46;"><i class="fa-brands fa-whatsapp"></i> Resolved via WhatsApp</div>
+            </div>
+
+            <div class="console-stat-box">
+              <div style="font-size: 11px; color: #4A706E; font-weight: 700; text-transform: uppercase;">Google Maps Rating</div>
+              <div class="console-stat-val" style="color: #F59E0B;">4.9 ★</div>
+              <div class="console-stat-sub">Google 3-Pack Rank #1</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Bar -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            
+            <!-- Live Review Stream -->
+            <div style="background: #FFFFFF; border: 1px solid #99F6E4; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(11, 61, 59, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: #0B3D3B; margin: 0;">Recent Incoming Reviews</h3>
+                <span style="font-size: 11px; color: #14B8A6; font-weight: 700;">Google Business Profile Live Sync</span>
+              </div>
+
+              <div class="console-review-item" style="border-left: 3px solid #14B8A6; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="font-weight: 700; font-size: 13px; color: #0B3D3B;">Aakash Verma</span>
+                  <span style="color: #F59E0B; font-size: 11px;">★★★★★</span>
+                </div>
+                <p style="font-size: 12px; color: #4A706E; margin: 0 0 6px;">"Best woodfired pizza in Indiranagar! Truffle Pasta was creamy and authentic. Great vibe."</p>
+                <div style="font-size: 11px; color: #10B981; font-weight: 600;">✓ Autopilot replied in 42s</div>
+              </div>
+
+              <div class="console-review-item" style="border-left: 3px solid #14B8A6; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="font-weight: 700; font-size: 13px; color: #0B3D3B;">Sneha Pillai</span>
+                  <span style="color: #F59E0B; font-size: 11px;">★★★★★</span>
+                </div>
+                <p style="font-size: 12px; color: #4A706E; margin: 0 0 6px;">"Loved the cold brew and attentive service. Definitely our new favorite weekend spot."</p>
+                <div style="font-size: 11px; color: #10B981; font-weight: 600;">✓ Autopilot replied in 58s</div>
+              </div>
+            </div>
+
+            <!-- WhatsApp Socket Quick Status -->
+            <div style="background: #FFFFFF; border: 1px solid #99F6E4; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(11, 61, 59, 0.04);">
+              <h3 style="font-size: 1.1rem; font-weight: 800; color: #0B3D3B; margin: 0 0 16px;">WhatsApp Socket Status</h3>
+              
+              <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 16px;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 36px; color: #10B981; margin-bottom: 8px;"></i>
+                <div style="font-size: 14px; font-weight: 800; color: #065F46;">Device Session Active</div>
+                <div style="font-size: 11px; color: #047857; margin-top: 4px;">Linked: +91 98765 43210 (Manager)</div>
+              </div>
+
+              <div style="font-size: 12px; color: #4A706E; line-height: 1.6; margin-bottom: 16px;">
+                • Sovereign multi-device socket<br>
+                • Meta API fees: <strong>$0.00</strong><br>
+                • Response latency: <strong>1.2s</strong>
+              </div>
+
+              <button class="btn btn-primary btn-block" style="font-size: 12px;" onclick="switchDashTab('whatsapp')">
+                Manage WhatsApp Socket &rarr;
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- TAB 2: WHATSAPP SHIELD (Unofficial Socket Architecture) -->
+        <section id="pane-whatsapp" class="dash-tab-pane">
+          <div class="wa-socket-status-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="wa-status-pill connected" id="wa-pill-status">
+                  <span style="width: 7px; height: 7px; background: #10B981; border-radius: 50%;"></span>
+                  Multi-Device Socket Active (Connected)
+                </span>
+                <h2 style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 8px 0 4px;">
+                  Sovereign WhatsApp Device Pairing & Shield
+                </h2>
+                <p style="font-size: 13px; color: #4A706E; margin: 0;">
+                  Self-hosted multi-device socket protocol. $0 SMS/WhatsApp fees forever. No Meta Business API pre-approvals required.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-sm btn-secondary" id="btn-wa-reconnect" onclick="simulateWaReconnect()">
+                  <i class="fa-solid fa-arrows-rotate"></i> Restart Socket
+                </button>
+                <button class="btn btn-sm btn-secondary" style="color: #EF4444; border-color: #FECACA;" onclick="simulateWaDisconnect()">
+                  <i class="fa-solid fa-power-off"></i> Disconnect
+                </button>
+              </div>
+            </div>
+
+            <!-- Pairing Mode Switcher -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+              
+              <!-- Left: QR Code Pairing Canvas -->
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 14px; padding: 24px; text-align: center;">
+                <h4 style="margin: 0 0 8px; color: #0B3D3B; font-size: 14px; font-weight: 800;">Method 1: Scan QR Code via Linked Devices</h4>
+                <p style="font-size: 12px; color: #4A706E; margin-bottom: 16px;">Open WhatsApp on manager phone > Linked Devices > Link a Device</p>
+                
+                <div class="wa-qr-box" id="wa-qr-canvas">
+                  <i class="fa-solid fa-qrcode" style="font-size: 140px; color: #0B3D3B;"></i>
+                </div>
+                <span style="font-size: 11px; color: #10B981; font-weight: 700;">● Socket Listening for Handshake</span>
+              </div>
+
+              <!-- Right: 8-Digit Pairing Code Alternative -->
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 14px; padding: 24px;">
+                <h4 style="margin: 0 0 8px; color: #0B3D3B; font-size: 14px; font-weight: 800;">Method 2: 8-Digit Pairing Code</h4>
+                <p style="font-size: 12px; color: #4A706E; margin-bottom: 12px;">Link via phone number without using your camera:</p>
+
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; font-size: 11px; font-weight: 700; color: #0B3D3B; margin-bottom: 4px;">Manager WhatsApp Number (with country code):</label>
+                  <input type="text" id="wa-pair-phone" value="+91 98765 43210" style="width: 100%; padding: 8px 12px; border: 1px solid #99F6E4; border-radius: 6px; font-size: 13px;">
+                </div>
+
+                <div class="wa-pair-code-display" id="wa-pair-code">
+                  RWQR-8924
+                </div>
+
+                <button class="btn btn-sm btn-primary btn-block" onclick="generateNewPairCode()">
+                  Generate New Pairing Code
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Interception Configuration -->
+            <div style="margin-top: 24px; padding: 20px; background: #E6FFFB; border: 1px solid #14B8A6; border-radius: 12px;">
+              <h4 style="margin: 0 0 8px; color: #0B3D3B; font-size: 14px; font-weight: 800;">Private Grievance Interception Rule</h4>
+              <p style="font-size: 12px; color: #234745; margin-bottom: 12px;">
+                When a customer rates <strong>1, 2, or 3 stars</strong>, the public Google review popup is safely suppressed. An instant private WhatsApp alert is pushed to your manager phone with table number and guest mobile.
+              </p>
+              
+              <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #0B3D3B;">
+                  <input type="checkbox" checked> Intercept 1-Star Ratings
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #0B3D3B;">
+                  <input type="checkbox" checked> Intercept 2-Star Ratings
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #0B3D3B;">
+                  <input type="checkbox" checked> Intercept 3-Star Ratings
+                </label>
+              </div>
+
+              <div style="margin-top: 14px;">
+                <button class="btn btn-sm btn-primary" onclick="simulateTestWaAlert()">
+                  <i class="fa-brands fa-whatsapp"></i> Send Test WhatsApp Grievance Alert
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- TAB 3: SMART STANDEES -->
+        <section id="pane-standees" class="dash-tab-pane">
+          <div style="background: #FFFFFF; border: 1px solid #99F6E4; border-radius: 16px; padding: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <div>
+                <h2 style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 0 0 4px;">Smart QR & NFC Standees</h2>
+                <p style="font-size: 13px; color: #4A706E; margin: 0;">Download vector print files or order replacement laser-engraved acrylic standees.</p>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="showToast('Print-ready SVG vector downloaded successfully!')">
+                <i class="fa-solid fa-download"></i> Download Vector SVG
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 12px; padding: 20px; text-align: center;">
+                <h4 style="margin: 0 0 8px; color: #0B3D3B;">Counter Standee #1 (Billing)</h4>
+                <div style="width: 140px; height: 140px; background: #FFFFFF; border-radius: 8px; margin: 0 auto 12px; padding: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #99F6E4;">
+                  <i class="fa-solid fa-qrcode" style="font-size: 110px; color: #0B3D3B;"></i>
+                </div>
+                <div style="font-size: 12px; color: #4A706E;">URL: reviewwoqr.com/r/cafe-verona-c1</div>
+                <div style="font-size: 11px; color: #10B981; font-weight: 700; margin-top: 4px;">1,120 Total Scans</div>
+              </div>
+
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 12px; padding: 20px; text-align: center;">
+                <h4 style="margin: 0 0 8px; color: #0B3D3B;">Table Tent #2 (Dining Patio)</h4>
+                <div style="width: 140px; height: 140px; background: #FFFFFF; border-radius: 8px; margin: 0 auto 12px; padding: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #99F6E4;">
+                  <i class="fa-solid fa-qrcode" style="font-size: 110px; color: #0B3D3B;"></i>
+                </div>
+                <div style="font-size: 12px; color: #4A706E;">URL: reviewwoqr.com/r/cafe-verona-c2</div>
+                <div style="font-size: 11px; color: #10B981; font-weight: 700; margin-top: 4px;">722 Total Scans</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: AUTOPILOT -->
+        <section id="pane-autopilot" class="dash-tab-pane">
+          <div style="background: #FFFFFF; border: 1px solid #99F6E4; border-radius: 16px; padding: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <div>
+                <h2 style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 0 0 4px;">24/7 Autopilot Review Reply</h2>
+                <p style="font-size: 13px; color: #4A706E; margin: 0;">AI replies to 100% of incoming Google reviews to maintain maximum Map Pack velocity.</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; font-weight: 700; color: #0B3D3B;">Autopilot Mode:</span>
+                <span style="background: #ECFDF5; color: #065F46; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800;">ACTIVE</span>
+              </div>
+            </div>
+
+            <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+              <h4 style="margin: 0 0 6px; color: #0B3D3B;">Autopilot Keyword Configuration</h4>
+              <p style="font-size: 12px; color: #4A706E; margin-bottom: 12px;">Keywords automatically weaved into owner replies:</p>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <span style="background: #E6FFFB; border: 1px solid #14B8A6; color: #0B3D3B; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">#trufflepasta</span>
+                <span style="background: #E6FFFB; border: 1px solid #14B8A6; color: #0B3D3B; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">#woodfiredpizza</span>
+                <span style="background: #E6FFFB; border: 1px solid #14B8A6; color: #0B3D3B; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">#coldbrew</span>
+                <span style="background: #E6FFFB; border: 1px solid #14B8A6; color: #0B3D3B; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">#bestcafeinindiranagar</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 5: BILLING & PLANS (₹149, ₹299, ₹799) -->
+        <section id="pane-billing" class="dash-tab-pane">
+          <div style="background: #FFFFFF; border: 1px solid #99F6E4; border-radius: 16px; padding: 28px;">
+            <h2 style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 0 0 16px;">Subscription & Invoices</h2>
+            
+            <div style="background: #E6FFFB; border: 2px solid #14B8A6; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span style="font-size: 11px; font-weight: 800; background: #14B8A6; color: #fff; padding: 2px 8px; border-radius: 4px;">CURRENT PLAN</span>
+                <h3 style="margin: 6px 0 2px; font-size: 1.3rem; font-weight: 900; color: #0B3D3B;">Growth Plan — ₹299 / month</h3>
+                <p style="margin: 0; font-size: 12px; color: #234745;">Next renewal on December 7, 2026. Self-hosted WhatsApp socket & unlimited AI review drafts active.</p>
+              </div>
+              <a href="pricing.html" class="btn btn-primary" style="font-size: 13px;">Change Plan</a>
+            </div>
+
+            <h4 style="margin: 0 0 12px; color: #0B3D3B;">Available Tiers</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 14px; font-weight: 800; color: #0B3D3B;">Starter</div>
+                <div style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 4px 0;">₹149 / mo</div>
+                <div style="font-size: 12px; color: #4A706E;">1 Location, 150 AI Drafts/mo, Self-hosted WhatsApp Shield.</div>
+              </div>
+
+              <div style="background: #E6FFFB; border: 1.5px solid #14B8A6; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 14px; font-weight: 800; color: #0B3D3B;">Growth (Active)</div>
+                <div style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 4px 0;">₹299 / mo</div>
+                <div style="font-size: 12px; color: #234745;">Unlimited AI Drafts, Free Acrylic Standee, 24/7 Autopilot Reply.</div>
+              </div>
+
+              <div style="background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 14px; font-weight: 800; color: #0B3D3B;">Agency Hub</div>
+                <div style="font-size: 1.4rem; font-weight: 900; color: #0B3D3B; margin: 4px 0;">₹799 / mo</div>
+                <div style="font-size: 12px; color: #4A706E;">5 Locations, White-Label Client Portal, 5 Free Standees.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    // Tab switching inside Dashboard
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.dash-nav-link');
+      const panes = document.querySelectorAll('.dash-tab-pane');
+      const titleEl = document.getElementById('dash-current-title');
+
+      window.switchDashTab = function (tabId) {
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.tab === tabId));
+        panes.forEach(p => p.classList.toggle('active', p.id === 'pane-' + tabId));
+        
+        const activeLink = document.querySelector(`.dash-nav-link[data-tab="${tabId}"]`);
+        if (activeLink && titleEl) {
+          titleEl.textContent = activeLink.querySelector('span').textContent;
+        }
+      };
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function () {
+          const tab = this.dataset.tab;
+          if (tab) switchDashTab(tab);
+        });
+      });
+
+      // Handle URL hash routing
+      const hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById('pane-' + hash)) {
+        switchDashTab(hash);
+      }
+    });
+
+    function simulateWaReconnect() {
+      showToast('Restarting self-hosted WhatsApp socket...');
+      setTimeout(() => {
+        showToast('WhatsApp socket reconnected successfully! Ready to dispatch.');
+      }, 1000);
+    }
+
+    function simulateWaDisconnect() {
+      const pill = document.getElementById('wa-pill-status');
+      if (pill) {
+        pill.className = 'wa-status-pill qr';
+        pill.innerHTML = '<span style="width: 7px; height: 7px; background: #F59E0B; border-radius: 50%;"></span> Session Disconnected. Scan QR to Pair.';
+      }
+      showToast('WhatsApp session cleared. Scan QR to re-link.');
+    }
+
+    function generateNewPairCode() {
+      const codeBox = document.getElementById('wa-pair-code');
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      if (codeBox) {
+        codeBox.textContent = 'RWQR-' + randomNum;
+      }
+      showToast('Generated fresh 8-digit pairing code.');
+    }
+
+    function simulateTestWaAlert() {
+      showToast('Simulated alert dispatched via Linked Device to manager phone!');
+    }
+  </script>
+</body>
+</html>

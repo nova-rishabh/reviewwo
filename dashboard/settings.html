@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings & Billing — Reviewwo QR Console</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar">
+    <div class="dash-brand">
+      <a href="../index.html"><img src="../assets/img/logo.svg" alt="Reviewwo QR"></a>
+    </div>
+
+    <nav class="dash-nav">
+      <span class="dash-nav-section-label">Main Console</span>
+      <a href="index.html" class="dash-nav-link"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+      <a href="reviews.html" class="dash-nav-link"><i class="fa-solid fa-star"></i> Reviews & Autopilot</a>
+      <a href="standees.html" class="dash-nav-link"><i class="fa-solid fa-qrcode"></i> Standees & QR Codes</a>
+      <a href="shield-logs.html" class="dash-nav-link"><i class="fa-solid fa-shield-halved"></i> Private Shield Logs</a>
+
+      <span class="dash-nav-section-label">Integrations</span>
+      <a href="whatsapp-gateway.html" class="dash-nav-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp Gateway</a>
+      <a href="settings.html" class="dash-nav-link active"><i class="fa-solid fa-gear"></i> Settings & Billing</a>
+    </nav>
+
+    <div class="dash-sidebar-footer">
+      <div class="dash-user-row">
+        <div class="dash-user-avatar" id="dash-avatar">CV</div>
+        <div class="dash-user-info">
+          <div class="dash-user-name" id="dash-username">Café Verona</div>
+          <div class="dash-user-plan" id="dash-userplan">Growth Plan (₹299/mo)</div>
+        </div>
+      </div>
+      <button onclick="handleSignOut()" style="margin-top: 10px; width: 100%; background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 7px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="dash-main">
+    <header class="dash-header">
+      <div class="dash-header-title">
+        <i class="fa-solid fa-gear" style="color: var(--color-accent);"></i>
+        <span>Settings & Subscription Management</span>
+      </div>
+
+      <div class="dash-header-actions">
+        <span class="wa-status-badge">Growth Tier: Active</span>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        
+        <!-- Business Profile -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Business Profile & GMB Link</h3>
+          </div>
+          <div class="panel-body">
+            <div style="margin-bottom: 12px;">
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--color-primary); margin-bottom:4px;">Business Legal / Display Name</label>
+              <input type="text" value="Café Verona & Bistro" style="width:100%; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:13px;">
+            </div>
+
+            <div style="margin-bottom: 12px;">
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--color-primary); margin-bottom:4px;">Google Place ID (Synced)</label>
+              <input type="text" value="ChIJN1t_tDeuEmsRUsoyG83frY4" readonly style="width:100%; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:13px; background:#F8FFFE;">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--color-primary); margin-bottom:4px;">Signature Highlights for AI Review Drafter</label>
+              <input type="text" value="Truffle Mushroom Pasta, Cold Brew, Woodfired Margherita Pizza, Tiramisu" style="width:100%; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:13px;">
+              <div style="font-size:11px; color:var(--color-text-muted); margin-top:4px;">These keywords are naturally woven into generated 5-star customer drafts.</div>
+            </div>
+
+            <button class="btn-primary" onclick="showDashToast('Business profile updated successfully!')">
+              Save Profile Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- Subscription & Plan -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Subscription Plan & Billing</h3>
+            <span style="font-size:12px; background:var(--color-surface); color:var(--color-primary); font-weight:700; padding:3px 10px; border-radius:99px;">Active</span>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#FAFCFC; border:1px solid var(--color-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+              <div>
+                <strong style="color:var(--color-primary); font-size:16px; display:block;">Growth Plan</strong>
+                <span style="font-size:12px; color:var(--color-text-muted);">Unlimited AI drafts • Autopilot Reply • Unofficial WhatsApp Shield</span>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:1.8rem; font-weight:900; color:var(--color-primary);">₹299</span>
+                <span style="font-size:12px; color:var(--color-text-muted);">/mo</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <span style="font-size:12px; font-weight:700; color:var(--color-primary); display:block; margin-bottom:8px;">Switch Your Plan</span>
+              <div style="display:flex; gap:10px;">
+                <button class="btn-outline" style="flex:1; justify-content:center; font-size:12px;">Starter (₹149/mo)</button>
+                <button class="btn-accent" style="flex:1; justify-content:center; font-size:12px;">Growth (₹299/mo)</button>
+                <button class="btn-outline" style="flex:1; justify-content:center; font-size:12px;">Agency (₹799/mo)</button>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--color-border); padding-top:14px; font-size:12px; color:var(--color-text-muted);">
+              <i class="fa-solid fa-lock" style="color:var(--color-accent);"></i> Secure Indian UPI / NetBanking / Cards supported via Razorpay.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>

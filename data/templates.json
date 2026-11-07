@@ -1,0 +1,5 @@
+{
+  "otp": "Your Reviewwo QR verification code is *{{otp}}*.\n\nEnter this code in your browser to sign in to your dashboard.\nValid for 5 minutes. Do not share with anyone.",
+  "grievance_alert": "⚠️ *Private Shield Alert — Café Verona*\n\n*Rating:* {{stars}} Stars\n*Table / Area:* {{table_no}}\n*Guest Name:* {{customer_name}}\n*Guest Phone:* {{customer_phone}}\n*Feedback:* \"{{feedback}}\"\n\n👉 *Action Required:* Tap here to chat with guest on WhatsApp to resolve: https://wa.me/{{clean_phone}}",
+  "review_invite": "Hi {{customer_name}}! Thank you for visiting Café Verona today ☕\n\nCould you take 10 seconds to share your 5-star experience on Google? AI has pre-drafted your review:\n👉 {{review_link}}\n\nWe appreciate your support!"
+}

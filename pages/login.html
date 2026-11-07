@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Reviewwo QR Console</title>
+  <meta name="description" content="Sign in to your Reviewwo QR dashboard to manage Google Business reviews, standees, and unofficial WhatsApp gateway.">
+  <link rel="canonical" href="https://reviewwoqr.com/pages/login.html">
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column; background: #F8FFFE;">
+
+  <!-- Header -->
+  <header class="navbar" style="background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(11, 61, 59, 0.08); height: 72px;">
+    <div class="container navbar-container" style="display: flex; align-items: center; justify-content: space-between; height: 100%;">
+      <a href="../index.html" class="nav-brand" aria-label="Reviewwo QR Home" style="display: flex; align-items: center;">
+        <img src="../assets/img/logo.svg" alt="Reviewwo QR" style="height: 38px; width: auto;">
+      </a>
+
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 13px; color: #4A706E;">Don't have an account?</span>
+        <a href="register.html" class="btn btn-primary btn-sm" style="font-weight: 800; font-size: 13px; padding: 8px 16px;">
+          Start Free Trial &rarr;
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Card Container -->
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1rem;">
+    <div class="card" style="max-width: 440px; width: 100%; padding: 2.5rem; background: #FFFFFF; border: 1.5px solid #99F6E4; border-radius: 24px; box-shadow: 0 20px 50px rgba(11, 61, 59, 0.08);">
+      
+      <div style="text-align: center; margin-bottom: 1.75rem;">
+        <span class="badge" style="background:#E6FFFB; color:#0B3D3B; border:1px solid #99F6E4; font-weight:800; font-size:11px;">ENTERPRISE PORTAL</span>
+        <h2 style="font-size: 1.8rem; font-weight: 900; color: #0B3D3B; margin-top: 8px; margin-bottom: 4px;">Sign In to Reviewwo QR</h2>
+        <p style="color: #4A706E; font-size: 13.5px; margin: 0;">Access your reputation console, standees, and review autopilot.</p>
+      </div>
+
+      <div id="auth-error-banner" style="display: none; background: #FEE2E2; border: 1px solid #EF4444; color: #991B1B; padding: 10px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 18px;">
+      </div>
+
+      <!-- Auth Method Selector Tabs -->
+      <div style="display: flex; gap: 8px; background: #F8FFFE; border: 1px solid #99F6E4; border-radius: 10px; padding: 4px; margin-bottom: 20px;">
+        <button type="button" id="tab-btn-email" onclick="switchAuthTab('email')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: #14B8A6; color: #FFFFFF;">
+          <i class="fa-solid fa-envelope"></i> Email & Password
+        </button>
+        <button type="button" id="tab-btn-whatsapp" onclick="switchAuthTab('whatsapp')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: transparent; color: #0B3D3B;">
+          <i class="fa-brands fa-whatsapp" style="color: #10B981;"></i> WhatsApp OTP
+        </button>
+      </div>
+
+      <!-- Method 1: Email & Password Form -->
+      <form id="login-form-email">
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size: 13px; font-weight: 700; color: #0B3D3B; margin-bottom: 6px;">Work Email Address</label>
+          <input type="email" id="email" class="audit-input" style="width: 100%;" placeholder="owner@business.com" required>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size: 13px; font-weight: 700; color: #0B3D3B; margin: 0;">Password</label>
+            <a href="#" onclick="alert('Password reset instructions will be sent to your registered email.')" style="font-size: 12px; color: #14B8A6; font-weight: 600; text-decoration: none;">Forgot password?</a>
+          </div>
+          <input type="password" id="password" class="audit-input" style="width: 100%;" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" id="btn-submit-email" class="btn btn-primary btn-block" style="margin-bottom: 16px; padding: 12px;">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Dashboard
+        </button>
+      </form>
+
+      <!-- Method 2: WhatsApp OTP Form -->
+      <form id="login-form-whatsapp" style="display: none;">
+        <div id="wa-step-phone" style="margin-bottom: 16px;">
+          <label style="display:block; font-size: 13px; font-weight: 700; color: #0B3D3B; margin-bottom: 6px;">WhatsApp Phone Number</label>
+          <input type="tel" id="wa-phone" class="audit-input" style="width: 100%;" placeholder="+91 98765 43210">
+          <p style="font-size: 11px; color: #4A706E; margin: 6px 0 16px;">We dispatch a secure 6-digit OTP directly through our unofficial WhatsApp socket gateway with ₹0 SMS fees.</p>
+          <button type="button" id="btn-request-wa-otp" onclick="requestWhatsAppOtp()" class="btn btn-primary btn-block" style="padding: 12px;">
+            <i class="fa-brands fa-whatsapp"></i> Send WhatsApp OTP
+          </button>
+        </div>
+
+        <div id="wa-step-otp" style="display: none; margin-bottom: 16px;">
+          <label style="display:block; font-size: 13px; font-weight: 700; color: #0B3D3B; margin-bottom: 6px;">Enter 6-Digit OTP</label>
+          <input type="text" id="wa-otp" class="audit-input" style="width: 100%; text-align: center; font-size: 20px; letter-spacing: 6px; font-weight: 900;" placeholder="000000" maxlength="6">
+          <p style="font-size: 11px; color: #10B981; margin: 6px 0 16px; font-weight: 600;">Verification code dispatched to your WhatsApp.</p>
+          <button type="button" id="btn-verify-wa-otp" onclick="verifyWhatsAppOtp()" class="btn btn-primary btn-block" style="padding: 12px;">
+            <i class="fa-solid fa-circle-check"></i> Verify & Sign In
+          </button>
+        </div>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 13px; color: #4A706E;">
+        New to Reviewwo QR? <a href="register.html" style="color: #14B8A6; font-weight: 800; text-decoration: none;">Create an Account</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTarget = urlParams.get('redirect') || '../dashboard/index.html';
+
+    function showError(msg) {
+      const banner = document.getElementById('auth-error-banner');
+      banner.textContent = msg;
+      banner.style.display = 'block';
+    }
+
+    function clearError() {
+      document.getElementById('auth-error-banner').style.display = 'none';
+    }
+
+    function switchAuthTab(type) {
+      clearError();
+      const emailTab = document.getElementById('tab-btn-email');
+      const waTab = document.getElementById('tab-btn-whatsapp');
+      const emailForm = document.getElementById('login-form-email');
+      const waForm = document.getElementById('login-form-whatsapp');
+
+      if (type === 'email') {
+        emailTab.style.background = '#14B8A6';
+        emailTab.style.color = '#FFFFFF';
+        waTab.style.background = 'transparent';
+        waTab.style.color = '#0B3D3B';
+        emailForm.style.display = 'block';
+        waForm.style.display = 'none';
+      } else {
+        waTab.style.background = '#14B8A6';
+        waTab.style.color = '#FFFFFF';
+        emailTab.style.background = 'transparent';
+        emailTab.style.color = '#0B3D3B';
+        waForm.style.display = 'block';
+        emailForm.style.display = 'none';
+      }
+    }
+
+    // Email login handler
+    document.getElementById('login-form-email').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearError();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const btn = document.getElementById('btn-submit-email');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          localStorage.setItem('rw_token', data.token);
+          localStorage.setItem('rw_user', JSON.stringify(data.user));
+          window.showToast('Authentication verified. Loading console...');
+          setTimeout(() => {
+            window.location.href = redirectTarget;
+          }, 400);
+        } else {
+          showError(data.error || 'Invalid credentials. Please verify your email and password.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Dashboard';
+        }
+      } catch (err) {
+        showError('Unable to connect to authentication server. Please check your network connection.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Dashboard';
+      }
+    });
+
+    // WhatsApp OTP request handler
+    async function requestWhatsAppOtp() {
+      clearError();
+      const phone = document.getElementById('wa-phone').value.trim();
+      if (!phone) {
+        showError('Please enter a valid WhatsApp phone number.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-request-wa-otp');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Code via WhatsApp...';
+
+      try {
+        const res = await fetch('/api/v1/auth/whatsapp-otp/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          window.showToast('Verification code dispatched to your WhatsApp number.');
+          document.getElementById('wa-step-phone').style.display = 'none';
+          document.getElementById('wa-step-otp').style.display = 'block';
+        } else {
+          showError(data.error || 'Failed to dispatch WhatsApp OTP.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send WhatsApp OTP';
+        }
+      } catch (err) {
+        showError('Network error while requesting WhatsApp OTP.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send WhatsApp OTP';
+      }
+    }
+
+    // WhatsApp OTP verify handler
+    async function verifyWhatsAppOtp() {
+      clearError();
+      const phone = document.getElementById('wa-phone').value.trim();
+      const code = document.getElementById('wa-otp').value.trim();
+
+      if (!code || code.length < 6) {
+        showError('Please enter the complete 6-digit code received on WhatsApp.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-verify-wa-otp');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+
+      try {
+        const res = await fetch('/api/v1/auth/whatsapp-otp/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, code })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          localStorage.setItem('rw_token', data.token);
+          localStorage.setItem('rw_user', JSON.stringify(data.user));
+          window.showToast('Verified successfully. Accessing console...');
+          setTimeout(() => {
+            window.location.href = redirectTarget;
+          }, 400);
+        } else {
+          showError(data.error || 'Invalid or expired verification code.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Verify & Sign In';
+        }
+      } catch (err) {
+        showError('Network error during verification.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Verify & Sign In';
+      }
+    }
+  </script>
+</body>
+</html>

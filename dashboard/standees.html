@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standees & Hardware — Reviewwo QR Console</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar">
+    <div class="dash-brand">
+      <a href="../index.html"><img src="../assets/img/logo.svg" alt="Reviewwo QR"></a>
+    </div>
+
+    <nav class="dash-nav">
+      <span class="dash-nav-section-label">Main Console</span>
+      <a href="index.html" class="dash-nav-link"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+      <a href="reviews.html" class="dash-nav-link"><i class="fa-solid fa-star"></i> Reviews & Autopilot</a>
+      <a href="standees.html" class="dash-nav-link active"><i class="fa-solid fa-qrcode"></i> Standees & QR Codes</a>
+      <a href="shield-logs.html" class="dash-nav-link"><i class="fa-solid fa-shield-halved"></i> Private Shield Logs</a>
+
+      <span class="dash-nav-section-label">Integrations</span>
+      <a href="whatsapp-gateway.html" class="dash-nav-link"><i class="fa-brands fa-whatsapp"></i> WhatsApp Gateway</a>
+      <a href="settings.html" class="dash-nav-link"><i class="fa-solid fa-gear"></i> Settings & Billing</a>
+    </nav>
+
+    <div class="dash-sidebar-footer">
+      <div class="dash-user-row">
+        <div class="dash-user-avatar" id="dash-avatar">CV</div>
+        <div class="dash-user-info">
+          <div class="dash-user-name" id="dash-username">Café Verona</div>
+          <div class="dash-user-plan" id="dash-userplan">Growth Plan (₹299/mo)</div>
+        </div>
+      </div>
+      <button onclick="handleSignOut()" style="margin-top: 10px; width: 100%; background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 7px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="dash-main">
+    <header class="dash-header">
+      <div class="dash-header-title">
+        <i class="fa-solid fa-qrcode" style="color: var(--color-accent);"></i>
+        <span>Smart Standees & NFC Hardware Manager</span>
+      </div>
+
+      <div class="dash-header-actions">
+        <button class="btn-primary" onclick="document.getElementById('modal-new-standee').style.display='flex'">
+          <i class="fa-solid fa-plus"></i> Create Standee
+        </button>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      
+      <!-- Hardware Summary -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-title">Active Standees</div>
+          <div class="stat-card-val">2</div>
+          <div class="stat-card-sub">Counter + Garden Area</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Total NFC Taps & Scans</div>
+          <div class="stat-card-val">1,842</div>
+          <div class="stat-card-sub"><i class="fa-solid fa-bolt"></i> Average 61 scans/day</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Completed 5-Star Reviews</div>
+          <div class="stat-card-val">1,568</div>
+          <div class="stat-card-sub" style="color: #10B981;">85.2% verified conversion</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Hardware Warranty</div>
+          <div class="stat-card-val">Lifetime</div>
+          <div class="stat-card-sub">Free replacement on damage</div>
+        </div>
+      </div>
+
+      <!-- Active Standees Table -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Deployed Standees & Dynamic QR Codes</h3>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Standee Name</th>
+                <th>Location / Table</th>
+                <th>Hardware Type</th>
+                <th>Total Scans</th>
+                <th>Reviews</th>
+                <th>Conversion Rate</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Main Billing Counter Standee</strong>
+                  <div style="font-size:11px;color:var(--color-text-muted);">Slug: <code>/r/verona-counter</code></div>
+                </td>
+                <td>Billing Desk</td>
+                <td>Matte Acrylic A6 + NTAG213 NFC</td>
+                <td><strong>1,140</strong></td>
+                <td>972</td>
+                <td><span style="color:#10B981;font-weight:700;">85.2%</span></td>
+                <td><span style="background:var(--color-surface);color:var(--color-primary);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">Active</span></td>
+                <td>
+                  <a href="../assets/img/logo.svg" download class="btn-outline" style="padding:6px 12px;font-size:12px;"><i class="fa-solid fa-download"></i> SVG Print</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Outdoor Garden Table Tent</strong>
+                  <div style="font-size:11px;color:var(--color-text-muted);">Slug: <code>/r/verona-garden</code></div>
+                </td>
+                <td>Tables 1-8</td>
+                <td>Wooden Base Acrylic + NFC</td>
+                <td><strong>702</strong></td>
+                <td>596</td>
+                <td><span style="color:#10B981;font-weight:700;">84.9%</span></td>
+                <td><span style="background:var(--color-surface);color:var(--color-primary);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">Active</span></td>
+                <td>
+                  <a href="../assets/img/logo.svg" download class="btn-outline" style="padding:6px 12px;font-size:12px;"><i class="fa-solid fa-download"></i> SVG Print</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Create Standee Modal -->
+  <div id="modal-new-standee" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,28,27,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#FFF;border-radius:16px;max-width:440px;width:100%;padding:28px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h4 style="margin:0;font-size:16px;font-weight:800;color:var(--color-primary);">Create New Standee</h4>
+        <button onclick="document.getElementById('modal-new-standee').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button>
+      </div>
+
+      <form id="form-create-standee">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;">Standee Label</label>
+          <input type="text" name="title" value="Bar Counter Standee" required style="width:100%;padding:10px;border:1px solid var(--color-border);border-radius:8px;font-size:13px;">
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;">Assigned Area / Table</label>
+          <input type="text" name="tableNo" value="Bar Counter" required style="width:100%;padding:10px;border:1px solid var(--color-border);border-radius:8px;font-size:13px;">
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;">Acrylic Color</label>
+          <select name="color" style="width:100%;padding:10px;border:1px solid var(--color-border);border-radius:8px;font-size:13px;">
+            <option value="#0B3D3B">Deep Emerald Forest</option>
+            <option value="#051C1B">Obsidian Matte Black</option>
+            <option value="#14B8A6">Luminous Vibrant Teal</option>
+            <option value="#FFFFFF">Pure Minimal White</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+          Generate Dynamic QR Code
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>

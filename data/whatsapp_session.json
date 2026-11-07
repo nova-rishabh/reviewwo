@@ -1,0 +1,10 @@
+{
+  "status": "QR_READY",
+  "phoneNumber": "+919876543210",
+  "deviceName": "Reviewwo WhatsApp Gateway (Sovereign Socket)",
+  "connectedAt": "2026-11-07T08:22:08.280Z",
+  "batteryLevel": 91,
+  "totalDispatches": 1420,
+  "smsFeesSaved": "₹2840",
+  "mode": "sovereign_socket"
+}

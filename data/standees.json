@@ -1,0 +1,26 @@
+[
+  {
+    "id": "stn_001",
+    "title": "Main Billing Counter Standee",
+    "color": "#0B3D3B",
+    "qrSlug": "verona-counter",
+    "tableNo": "Billing Desk",
+    "scans": 1140,
+    "reviewsGenerated": 972,
+    "conversionRate": "85.2%",
+    "hardwareType": "Matte Acrylic A6 + NTAG213 NFC",
+    "status": "active"
+  },
+  {
+    "id": "stn_002",
+    "title": "Outdoor Garden Table Tent",
+    "color": "#14B8A6",
+    "qrSlug": "verona-garden",
+    "tableNo": "Tables 1-8",
+    "scans": 702,
+    "reviewsGenerated": 596,
+    "conversionRate": "84.9%",
+    "hardwareType": "Wooden Base Acrylic + NFC",
+    "status": "active"
+  }
+]
