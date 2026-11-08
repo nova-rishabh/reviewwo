@@ -10,7 +10,7 @@ export async function POST(request) {
     const { id, name, remove } = await request.json();
     const cards = loadData('standees.json', []);
     const index = cards.findIndex((c) => c.id === id && c.userId === session.id);
-    if (index === -1) return NextResponse.json({ error: 'Card not found.' }, { status: 404 });
+    if (index === -1) return NextResponse.json({ error: 'QR code not found.' }, { status: 404 });
 
     if (remove === true) {
       const [removed] = cards.splice(index, 1);
@@ -19,11 +19,11 @@ export async function POST(request) {
     }
 
     const clean = String(name || '').trim().slice(0, 60);
-    if (!clean) return NextResponse.json({ error: 'Give the card a name.' }, { status: 400 });
+    if (!clean) return NextResponse.json({ error: 'Give the QR code a name.' }, { status: 400 });
     cards[index].name = clean;
     saveData('standees.json', cards);
     return NextResponse.json({ success: true, standee: cards[index] });
   } catch (err) {
-    return NextResponse.json({ error: 'Could not update the card.' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not update the QR code.' }, { status: 500 });
   }
 }

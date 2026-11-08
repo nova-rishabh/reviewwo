@@ -6,7 +6,7 @@ const DEFAULT_TEMPLATES = {
   feedback_alert:
     'New feedback for {{business_name}}\n\nRating: {{stars}} of 5\nWhere: {{where}}\nFrom: {{customer_name}}\nContact: {{customer_contact}}\n\n"{{feedback}}"\n\nOpen your Reviewwo dashboard to mark it resolved.',
   test_alert:
-    'This is a test message from Reviewwo for {{business_name}}.\n\nFeedback alerts from your NFC cards will arrive on this number.',
+    'This is a test message from Reviewwo for {{business_name}}.\n\nFeedback alerts from your Reviewwo QR codes will arrive on this number.',
 };
 
 function fill(template, values) {

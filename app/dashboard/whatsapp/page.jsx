@@ -80,7 +80,7 @@ export default function WhatsAppSenderPage() {
         title="WhatsApp sender"
         description="The WhatsApp number Reviewwo uses to send feedback alerts and sign-in codes to every business. Only admins can see this page."
       />
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] [&>*]:min-w-0">
         <SectionCard title="Connection">
           <ErrorNote message={error} />
           <div className="flex items-center justify-between">

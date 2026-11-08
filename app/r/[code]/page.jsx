@@ -272,7 +272,7 @@ export default function ReviewPage({ params }) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
         <div className="max-w-sm">
-          <h1 className="text-2xl font-bold">{status === 'missing' ? 'This card isn’t set up yet' : 'Something went wrong'}</h1>
+          <h1 className="text-2xl font-bold">{status === 'missing' ? 'This code isn’t set up yet' : 'Something went wrong'}</h1>
           <p className="mt-2 text-ink-muted">
             {status === 'missing'
               ? 'Please let a member of staff know. Thank you for wanting to leave a review.'

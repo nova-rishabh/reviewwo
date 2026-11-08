@@ -9,6 +9,7 @@ import {
   normalizeMobile,
   PLAN_IDS,
 } from '../../../../src/lib/store.js';
+import { redeemCoupon, listCoupons, normalizeCode } from '../../../../src/lib/coupons.js';
 
 export async function POST(request) {
   try {
@@ -29,6 +30,16 @@ export async function POST(request) {
     }
     if (!mobile) {
       return NextResponse.json({ error: 'Enter a valid 10-digit mobile number.' }, { status: 400 });
+    }
+
+    // Check a coupon before creating the account so a typo does not leave a half-set-up account.
+    const couponCode = normalizeCode(body.coupon);
+    if (couponCode) {
+      const c = listCoupons().find((x) => x.code === couponCode);
+      if (!c || !c.active) return NextResponse.json({ error: 'This coupon code isn’t valid.' }, { status: 400 });
+      if (c.maxUses > 0 && c.uses >= c.maxUses) {
+        return NextResponse.json({ error: 'This coupon has already been used the maximum number of times.' }, { status: 400 });
+      }
     }
 
     const users = loadData('users.json', []);
@@ -58,6 +69,7 @@ export async function POST(request) {
       createdAt: new Date().toISOString(),
     };
 
+    if (couponCode) redeemCoupon(user, couponCode);
     users.push(user);
     saveData('users.json', users);
 

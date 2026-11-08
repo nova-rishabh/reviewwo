@@ -10,14 +10,14 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const name = String(body.name || '').trim().slice(0, 60);
-    if (!name) return NextResponse.json({ error: 'Give the card a name, such as “Front counter”.' }, { status: 400 });
+    if (!name) return NextResponse.json({ error: 'Give the QR code a name, such as “Front counter”.' }, { status: 400 });
 
     const cards = loadData('standees.json', []);
     const plan = PLAN_PRICING[session.plan] || PLAN_PRICING.starter;
     const owned = cards.filter((c) => c.userId === session.id).length;
     if (owned >= plan.standeesLimit) {
       return NextResponse.json(
-        { error: `Your ${plan.name} plan includes ${plan.standeesLimit} card${plan.standeesLimit === 1 ? '' : 's'}. Upgrade your plan to add more.`, limitReached: true },
+        { error: `Your ${plan.name} plan includes ${plan.standeesLimit} QR code${plan.standeesLimit === 1 ? '' : 's'}. Upgrade your plan to add more.`, limitReached: true },
         { status: 403 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(request) {
       id: `card_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       userId: session.id,
       name,
-      format: 'nfc_card',
+      format: 'qr',
       shortCode: newShortCode(codes),
       scans: 0,
       createdAt: new Date().toISOString(),
@@ -36,6 +36,6 @@ export async function POST(request) {
     saveData('standees.json', cards);
     return NextResponse.json({ success: true, standee: card });
   } catch (err) {
-    return NextResponse.json({ error: 'Could not create the card. Please try again.' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not create the QR code. Please try again.' }, { status: 500 });
   }
 }

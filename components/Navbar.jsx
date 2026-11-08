@@ -7,10 +7,11 @@ import { Menu, X } from 'lucide-react';
 import useSession from './useSession';
 
 const navLinks = [
+  { label: 'How it works', href: '/how-it-works' },
   { label: 'Features', href: '/features' },
-  { label: 'NFC cards', href: '/cards' },
+  { label: 'Who it’s for', href: '/for' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'For agencies', href: '/agency' },
+  { label: 'Guides', href: '/guides' },
 ];
 
 export default function Navbar() {
@@ -52,7 +53,7 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
           {navLinks.map((link) => {
-            const active = pathname === link.href;
+            const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
               <Link
                 key={link.href}

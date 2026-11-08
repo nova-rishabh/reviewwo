@@ -47,7 +47,7 @@ export default function OverviewPage() {
   const setup = [
     { done: Boolean(user.googlePlaceId), label: 'Link your Google listing', href: '/dashboard/settings#google' },
     { done: Boolean(user.alertMobile), label: 'Add a number for feedback alerts', href: '/dashboard/settings#alerts' },
-    { done: (cards || []).length > 0, label: 'Create your first card', href: '/dashboard/cards' },
+    { done: (cards || []).length > 0, label: 'Create your first QR code', href: '/dashboard/cards' },
     { done: totalScans > 0, label: 'Get your first scan', href: '/dashboard/cards' },
     { done: user.planStatus === 'active', label: 'Subscribe to a plan', href: '/dashboard/settings#plan' },
   ];
@@ -57,10 +57,10 @@ export default function OverviewPage() {
     <>
       <PageHeader
         title="Overview"
-        description={`How your cards are doing at ${user.businessName}.`}
+        description={`How your QR codes are doing at ${user.businessName}.`}
         actions={
           <Link href="/dashboard/cards" className="btn btn-primary">
-            Add a card
+            Add a QR code
           </Link>
         }
       />
@@ -75,10 +75,10 @@ export default function OverviewPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Card scans" value={loading ? '–' : totalScans} hint="All time, across your cards" href="/dashboard/cards" />
+        <Stat label="Scans" value={loading ? '–' : totalScans} hint="All time, across your QR codes" href="/dashboard/cards" />
         <Stat label="Open feedback" value={loading ? '–' : open.length} hint="Waiting for you to resolve" href="/dashboard/feedback" />
         <Stat label="Feedback this month" value={loading ? '–' : thisMonth} />
-        <Stat label="Active cards" value={loading ? '–' : (cards || []).length} href="/dashboard/cards" />
+        <Stat label="QR codes" value={loading ? '–' : (cards || []).length} href="/dashboard/cards" />
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
@@ -93,7 +93,7 @@ export default function OverviewPage() {
             <div className="px-6 py-10 text-center">
               <p className="font-medium text-ink">No feedback yet</p>
               <p className="mx-auto mt-1 max-w-sm text-sm text-ink-muted">
-                When a customer sends a private message from one of your cards, it will show up here.
+                When a customer sends a private message from one of your QR codes, it will show up here.
               </p>
             </div>
           ) : (
@@ -102,7 +102,7 @@ export default function OverviewPage() {
                 <li key={f.id} className="px-5 py-4 sm:px-6">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <StarRow value={f.rating} />
-                    <span className="text-sm text-ink-subtle">{f.cardName || 'Card'}</span>
+                    <span className="text-sm text-ink-subtle">{f.cardName || 'QR code'}</span>
                     <span className="text-sm text-ink-subtle">{timeAgo(f.receivedAt)}</span>
                     {f.status === 'open' ? <span className="badge badge-warning">Open</span> : <span className="badge badge-success">Resolved</span>}
                   </div>
@@ -144,13 +144,13 @@ export default function OverviewPage() {
 
           <section className="card">
             <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-6">
-              <h2 className="font-sans text-base font-semibold">Scans by card</h2>
+              <h2 className="font-sans text-base font-semibold">Scans by QR code</h2>
               <Link href="/dashboard/cards" className="link text-sm">Manage</Link>
             </div>
             {loading ? (
               <div className="h-24" />
             ) : cards.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-ink-muted">You haven’t created any cards yet.</p>
+              <p className="px-6 py-8 text-center text-sm text-ink-muted">You haven’t created any QR codes yet.</p>
             ) : (
               <ul className="divide-y divide-line">
                 {[...cards]

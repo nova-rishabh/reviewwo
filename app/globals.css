@@ -99,13 +99,28 @@
   .data-table th { @apply border-b border-line bg-canvas px-4 py-2.5 text-[13px] font-semibold text-ink-muted; }
   .data-table td { @apply border-b border-line px-4 py-3 align-middle text-ink; }
   .data-table tbody tr:last-child td { @apply border-b-0; }
-}
 
-/* Onboarding tour highlight */
-.tour-spotlight-active {
-  box-shadow: 0 0 0 3px #0F6B64;
-  border-radius: 0.75rem;
-  transition: box-shadow 0.2s ease;
+  /* Long-form article text. Kept under ~75 characters per line. */
+  .article { @apply max-w-[46rem] text-[17px] leading-[1.7] text-ink; }
+  .article > section + section { @apply mt-14; }
+  .article h2 { @apply mb-4 text-[1.75rem] font-bold leading-tight; }
+  .article h3 { @apply mb-2 mt-8 font-sans text-xl font-semibold; }
+  .article p { @apply mb-5 text-ink-muted; }
+  .article p strong, .article li strong { @apply font-semibold text-ink; }
+  .article ul, .article ol { @apply mb-6 space-y-2 pl-6 text-ink-muted; }
+  .article ul { @apply list-disc; }
+  .article ol { @apply list-decimal; }
+  .article li::marker { @apply text-ink-subtle; }
+  .article a:not(.btn) { @apply font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700; }
+  .article blockquote { @apply mb-6 border-l-2 border-brand-800 pl-5 text-ink; }
+  .article table { @apply mb-6 w-full border-collapse text-left text-[15px]; }
+  .article th { @apply border-b border-line bg-canvas px-3 py-2.5 font-semibold text-ink; }
+  .article td { @apply border-b border-line px-3 py-2.5 align-top text-ink-muted; }
+  .article code { @apply rounded bg-canvas px-1.5 py-0.5 font-mono text-[0.85em] text-ink; }
+  .article .table-wrap { @apply mb-6 overflow-x-auto; }
+  .article .table-wrap table { @apply mb-0; }
+  .article .note { @apply mb-6 rounded-[10px] border border-line bg-canvas px-5 py-4 text-[16px]; }
+  .article .note p:last-child { @apply mb-0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

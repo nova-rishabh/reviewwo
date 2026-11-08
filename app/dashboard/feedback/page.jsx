@@ -41,7 +41,7 @@ function FeedbackItem({ item, onChanged }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <StarRow value={item.rating} />
-            <span className="text-sm text-ink-subtle">{item.cardName || 'Card'}</span>
+            <span className="text-sm text-ink-subtle">{item.cardName || 'QR code'}</span>
             <time className="text-sm text-ink-subtle" dateTime={item.receivedAt} title={new Date(item.receivedAt).toLocaleString('en-IN')}>
               {timeAgo(item.receivedAt)}
             </time>
@@ -140,7 +140,7 @@ export default function FeedbackPage() {
     <>
       <PageHeader
         title="Feedback"
-        description="Private messages customers sent from your cards. We also forward each one to your alert number on WhatsApp."
+        description="Private messages customers sent from your QR codes. We also forward each one to your alert number on WhatsApp."
       />
       <ErrorNote message={error} />
 
@@ -173,7 +173,7 @@ export default function FeedbackPage() {
             <p className="mx-auto mt-1 max-w-sm text-sm text-ink-muted">
               {filter === 'open'
                 ? 'New messages from customers will appear here.'
-                : 'Messages customers send from your cards will appear here.'}
+                : 'Messages customers send from your QR codes will appear here.'}
             </p>
           </div>
         ) : (

@@ -14,11 +14,15 @@ services:
         generateValue: true
       - key: ADMIN_EMAILS
         sync: false
+      - key: ORDER_ALERT_MOBILE
+        sync: false
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: APP_URL
+        sync: false
+      - key: SITE_URL
         sync: false
       - key: NEXT_PUBLIC_APP_URL
         sync: false

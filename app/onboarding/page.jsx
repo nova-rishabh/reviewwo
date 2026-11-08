@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Check, ExternalLink, Loader2 } from 'lucide-react';
-import NfcCard from '../../components/NfcCard';
+import QrSign from '../../components/QrSign';
 import {
   apiGet,
   apiPost,
@@ -14,7 +14,7 @@ import {
   downloadDataUrl,
 } from '../../components/api';
 
-const STEPS = ['Business', 'Google listing', 'Alerts', 'First card'];
+const STEPS = ['Business', 'Google listing', 'Alerts', 'QR code'];
 
 function localNumber(mobile) {
   return String(mobile || '').replace(/^\+91/, '');
@@ -185,7 +185,7 @@ export default function OnboardingPage() {
           >
             <div>
               <h1 className="text-3xl font-bold">Tell us about your business</h1>
-              <p className="mt-2 text-ink-muted">Customers see this name when they tap your card.</p>
+              <p className="mt-2 text-ink-muted">Customers see this name when they scan your QR code.</p>
             </div>
             <ErrorNote message={error} />
             <div className="card space-y-5 p-6">
@@ -286,7 +286,7 @@ export default function OnboardingPage() {
             <div>
               <h1 className="text-3xl font-bold">Who should get feedback alerts?</h1>
               <p className="mt-2 text-ink-muted">
-                When a customer sends a private message from your card, we forward it to this WhatsApp number straight
+                When a customer sends a private message from your QR code, we forward it to this WhatsApp number straight
                 away. Usually this is the store manager.
               </p>
             </div>
@@ -338,9 +338,9 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold">Set up your first card</h1>
+              <h1 className="text-3xl font-bold">Create your first QR code</h1>
               <p className="mt-2 text-ink-muted">
-                Name it after where it will sit, so you can tell your cards apart later. You can add more cards at any
+                Name it after where it will sit, so you can tell your QR codes apart later. You can add more at any
                 time.
               </p>
             </div>
@@ -354,22 +354,22 @@ export default function OnboardingPage() {
                 className="card space-y-5 p-6"
               >
                 <div>
-                  <label htmlFor="cardName" className="label">Card name</label>
+                  <label htmlFor="cardName" className="label">Name</label>
                   <input id="cardName" required value={form.cardName} onChange={set('cardName')} className="input" placeholder="Front counter" />
                   <p className="hint">For example “Front counter”, “Table 4” or “Reception”.</p>
                 </div>
                 <button type="submit" disabled={saving} className="btn btn-primary">
-                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Create card
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Create QR code
                 </button>
               </form>
             ) : (
               <div className="card space-y-6 p-6">
-                <div className="mx-auto w-full max-w-[340px]">
-                  <NfcCard businessName={user.businessName} qrDataUrl={card.qrDataUrl} />
+                <div className="mx-auto w-full max-w-[260px]">
+                  <QrSign businessName={user.businessName} qrDataUrl={card.qrDataUrl} />
                 </div>
                 <dl className="grid gap-3 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-ink-subtle">Card</dt>
+                    <dt className="text-ink-subtle">Name</dt>
                     <dd className="font-medium text-ink">{card.name}</dd>
                   </div>
                   <div>

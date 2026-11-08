@@ -56,6 +56,8 @@ export async function POST(request) {
       record.plan = planId;
       record.billingCycle = billingCycle;
       record.planStatus = 'active';
+      record.planSource = 'payment';
+      record.planExpiresAt = null;
       record.lastPaymentDate = now;
       record.planPrice = billingCycle === 'annual' ? Math.round(plan.annualPrice / 12) : plan.monthlyPrice;
       saveData('users.json', users);

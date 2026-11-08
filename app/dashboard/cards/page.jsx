@@ -6,7 +6,7 @@ import { ExternalLink, Loader2, Copy, Check } from 'lucide-react';
 import { PageHeader, useDashboardUser } from '../../../components/DashboardShell';
 import { apiGet, apiPost, downloadDataUrl, downloadText } from '../../../components/api';
 import { ErrorNote, timeAgo } from '../../../components/ui';
-import NfcCard from '../../../components/NfcCard';
+import QrSign from '../../../components/QrSign';
 
 function CopyLink({ url }) {
   const [copied, setCopied] = useState(false);
@@ -72,7 +72,7 @@ function CardDetail({ card, businessName, onChanged, onRemoved }) {
     <section className="card">
       <div className="grid gap-8 p-5 sm:p-6 lg:grid-cols-[minmax(0,360px)_1fr]">
         <div>
-          <NfcCard businessName={businessName} qrDataUrl={card.qrDataUrl} />
+          <QrSign businessName={businessName} qrDataUrl={card.qrDataUrl} />
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={() => downloadDataUrl(card.qrDataUrl, `reviewwo-${card.shortCode}.png`)} className="btn btn-secondary btn-sm">
               Download PNG
@@ -105,9 +105,12 @@ function CardDetail({ card, businessName, onChanged, onRemoved }) {
           </dl>
 
           <div>
-            <p className="text-sm text-ink-subtle">Card link</p>
+            <p className="text-sm text-ink-subtle">Link</p>
             <p className="mt-1 break-all text-[15px] text-ink">{card.fullUrl}</p>
-            <p className="mt-1 text-[13px] text-ink-subtle">Write this link to the NFC chip, or use the QR code.</p>
+            <p className="mt-1 text-[13px] text-ink-subtle">
+              Print the QR code, or{' '}
+              <Link href="/dashboard/nfc" className="link">order an NFC card</Link> with this link for ₹50.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <CopyLink url={card.fullUrl} />
               <a href={`/r/${card.shortCode}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">
@@ -117,7 +120,7 @@ function CardDetail({ card, businessName, onChanged, onRemoved }) {
           </div>
 
           <form onSubmit={rename} className="border-t border-line pt-5">
-            <label htmlFor="card-name" className="label">Card name</label>
+            <label htmlFor="card-name" className="label">Name</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input id="card-name" required value={name} onChange={(e) => setName(e.target.value)} className="input sm:max-w-sm" />
               <button type="submit" disabled={busy || name.trim() === card.name} className="btn btn-secondary">
@@ -130,11 +133,11 @@ function CardDetail({ card, businessName, onChanged, onRemoved }) {
             {confirmRemove ? (
               <div className="space-y-3">
                 <p className="text-[15px] text-ink">
-                  Remove “{card.name}”? Its QR code and NFC link will stop working. This can’t be undone.
+                  Remove “{card.name}”? Its QR code will stop working, including on anything already printed. This can’t be undone.
                 </p>
                 <div className="flex gap-2">
                   <button type="button" onClick={remove} disabled={busy} className="btn btn-danger btn-sm">
-                    {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Remove card
+                    {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Remove QR code
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="btn btn-ghost btn-sm">
                     Keep it
@@ -143,7 +146,7 @@ function CardDetail({ card, businessName, onChanged, onRemoved }) {
               </div>
             ) : (
               <button type="button" onClick={() => setConfirmRemove(true)} className="btn btn-ghost btn-sm text-red-700 hover:bg-red-50 hover:text-red-800">
-                Remove card
+                Remove QR code
               </button>
             )}
           </div>
@@ -198,8 +201,8 @@ export default function CardsPage() {
   return (
     <>
       <PageHeader
-        title="Cards"
-        description="Each NFC card has its own link and QR code. Name cards after where they sit so you can compare them."
+        title="QR codes"
+        description="Each QR code opens your review page and counts its own scans. Name them after where they sit, like “Front counter” or “Table 4”, so you can compare."
       />
       <ErrorNote message={error} />
 
@@ -207,7 +210,7 @@ export default function CardsPage() {
         <div className="space-y-4">
           <form onSubmit={create} className="card p-4">
             <div className="mb-1.5 flex items-baseline justify-between">
-              <label htmlFor="new-card" className="text-sm font-medium text-ink">New card</label>
+              <label htmlFor="new-card" className="text-sm font-medium text-ink">New QR code</label>
               {cards !== null && (
                 <span className="text-[13px] tabular-nums text-ink-subtle">
                   {cards.length} of {user.cardLimit} used
@@ -230,7 +233,7 @@ export default function CardsPage() {
             </div>
             {atLimit && (
               <p className="mt-2 text-[13px] text-ink-muted">
-                You’ve used all the cards on your plan.{' '}
+                You’ve used all the QR codes on your plan.{' '}
                 <Link href="/pricing" className="link">Compare plans</Link>
               </p>
             )}
@@ -240,9 +243,9 @@ export default function CardsPage() {
             {cards === null ? (
               <div className="h-32" aria-busy="true" />
             ) : cards.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-ink-muted">No cards yet. Add your first one above.</p>
+              <p className="px-4 py-8 text-center text-sm text-ink-muted">No QR codes yet. Add your first one above.</p>
             ) : (
-              <ul className="divide-y divide-line" role="listbox" aria-label="Your cards">
+              <ul className="divide-y divide-line" role="listbox" aria-label="Your QR codes">
                 {cards.map((c) => (
                   <li key={c.id}>
                     <button
@@ -277,7 +280,7 @@ export default function CardsPage() {
         ) : (
           cards !== null && (
             <div className="card flex items-center justify-center p-10 text-center text-ink-muted">
-              Add a card to see its QR code and link.
+              Add a QR code to see it here.
             </div>
           )
         )}

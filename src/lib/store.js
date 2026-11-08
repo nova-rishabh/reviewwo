@@ -123,6 +123,13 @@ export function isAdminEmail(email) {
   return Boolean(email) && list.includes(String(email).toLowerCase());
 }
 
+/** 'active' | 'expired' | 'unpaid'. Plans granted with an end date (e.g. by coupon) expire on their own. */
+export function planStatusOf(u) {
+  if (u.planStatus !== 'active') return u.planStatus || 'unpaid';
+  if (u.planExpiresAt && new Date(u.planExpiresAt).getTime() < Date.now()) return 'expired';
+  return 'active';
+}
+
 /** Fields that are safe to send to the browser. */
 export function publicUser(u) {
   if (!u) return null;
@@ -138,10 +145,12 @@ export function publicUser(u) {
     alertName: u.alertName || '',
     alertMobile: u.alertMobile || '',
     plan: u.plan || 'starter',
-    planStatus: u.planStatus || 'unpaid',
+    planStatus: planStatusOf(u),
+    planSource: u.planSource || '',
+    planExpiresAt: u.planExpiresAt || null,
     billingCycle: u.billingCycle || 'monthly',
-    // Accounts created before onboarding existed count as onboarded if they have a Google listing.
     cardLimit: CARD_LIMITS[u.plan] || CARD_LIMITS.starter,
+    // Accounts created before onboarding existed count as onboarded if they have a Google listing.
     onboardingComplete: u.onboardingComplete === true || (u.onboardingComplete === undefined && Boolean(u.googlePlaceId)),
     isAdmin: isAdminEmail(u.email),
   };

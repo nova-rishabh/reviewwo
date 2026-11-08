@@ -1,19 +1,25 @@
 import './globals.css';
+import { SITE_URL, SITE_NAME } from '../src/lib/seo';
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://reviewwo.divergit.com'),
-  title: 'Reviewwo | NFC cards for Google reviews',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Reviewwo | Google Review QR Codes',
+    template: `%s | ${SITE_NAME}`,
+  },
   description:
-    'NFC review cards that make it easy for customers to review your business on Google, with private feedback and instant manager alerts.',
+    'Google review QR codes that make it easy for customers to review your business, with private feedback and instant manager alerts.',
+  applicationName: SITE_NAME,
   icons: {
     icon: [{ url: '/favicon.ico' }, { url: '/favicon.png', type: 'image/png' }],
     apple: [{ url: '/apple-icon.png' }],
   },
   openGraph: {
-    title: 'Reviewwo | NFC cards for Google reviews',
-    description: 'NFC review cards that help local businesses collect Google reviews in person.',
+    siteName: SITE_NAME,
+    locale: 'en_IN',
     type: 'website',
   },
+  formatDetection: { telephone: false },
 };
 
 export const viewport = {
@@ -24,7 +30,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <body>{children}</body>
     </html>
   );

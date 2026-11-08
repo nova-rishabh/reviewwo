@@ -23,6 +23,6 @@ export async function GET(request) {
     mine.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
     return NextResponse.json(mine);
   } catch (err) {
-    return NextResponse.json({ error: 'Could not load your cards.' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not load your QR codes.' }, { status: 500 });
   }
 }

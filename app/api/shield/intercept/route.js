@@ -36,7 +36,7 @@ export async function POST(request) {
     const card = cards.find((c) => String(c.shortCode || '').toLowerCase() === code);
     const users = loadData('users.json', []);
     const owner = card ? users.find((u) => u.id === card.userId) : null;
-    if (!card || !owner) return NextResponse.json({ error: 'This card is no longer active.' }, { status: 404 });
+    if (!card || !owner) return NextResponse.json({ error: 'This code is no longer active.' }, { status: 404 });
 
     const entry = {
       id: `fb_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,

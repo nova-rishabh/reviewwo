@@ -54,6 +54,52 @@ function PhoneInput({ id, value, onChange, required }) {
 
 const PLAN_NAMES = { starter: 'Starter', growth: 'Growth', agency: 'Agency' };
 
+function planLine(user) {
+  if (user.planSource === 'coupon') {
+    if (!user.planExpiresAt) return 'free with a coupon, no end date';
+    const d = new Date(user.planExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    return user.planStatus === 'expired' ? `free with a coupon, ended ${d}` : `free with a coupon until ${d}`;
+  }
+  return user.billingCycle === 'annual' ? 'billed yearly' : 'billed monthly';
+}
+
+function CouponForm({ onApplied }) {
+  const [code, setCode] = useState('');
+  const [state, setState] = useState({ busy: false, error: '' });
+  const apply = async (e) => {
+    e.preventDefault();
+    setState({ busy: true, error: '' });
+    try {
+      const res = await apiPost('/api/coupons/redeem', { code });
+      setCode('');
+      setState({ busy: false, error: '' });
+      onApplied(res);
+    } catch (err) {
+      setState({ busy: false, error: err.message });
+    }
+  };
+  return (
+    <form onSubmit={apply} className="mt-5 border-t border-line pt-5">
+      <label htmlFor="coupon" className="label">Have a coupon code?</label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          id="coupon"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className="input font-mono uppercase sm:max-w-xs"
+          placeholder="RW-XXXXXXXX"
+          autoCapitalize="characters"
+          spellCheck={false}
+        />
+        <button type="submit" disabled={state.busy || !code.trim()} className="btn btn-secondary">
+          {state.busy && <Loader2 className="h-4 w-4 animate-spin" />} Apply
+        </button>
+      </div>
+      {state.error && <p className="mt-2 text-sm text-red-700" role="alert">{state.error}</p>}
+    </form>
+  );
+}
+
 export default function SettingsPage() {
   const { user, refresh } = useDashboardUser();
   const business = useSection({ businessName: user.businessName, category: user.category, city: user.city });
@@ -79,7 +125,7 @@ export default function SettingsPage() {
 
       <div className="grid max-w-5xl gap-6">
         <form onSubmit={business.save}>
-          <SectionCard id="business" title="Business" description="Shown to customers when they tap your card." footer={<SaveFooter state={business.state} />}>
+          <SectionCard id="business" title="Business" description="Shown to customers when they scan your QR code." footer={<SaveFooter state={business.state} />}>
             <ErrorNote message={business.state.error} />
             <div className="grid gap-5 md:grid-cols-3">
               <div className="md:col-span-1">
@@ -188,11 +234,13 @@ export default function SettingsPage() {
               <p className="text-[15px] text-ink">
                 <span className="font-semibold">{PLAN_NAMES[user.plan] || user.plan}</span>
                 {', '}
-                {user.billingCycle === 'annual' ? 'billed yearly' : 'billed monthly'}
+                {planLine(user)}
               </p>
               <p className="mt-1">
                 {user.planStatus === 'active' ? (
                   <span className="badge badge-success">Active</span>
+                ) : user.planStatus === 'expired' ? (
+                  <span className="badge badge-warning">Ended</span>
                 ) : (
                   <span className="badge badge-warning">Not paid yet</span>
                 )}
@@ -215,6 +263,13 @@ export default function SettingsPage() {
               <Link href="/pricing" className="btn btn-secondary btn-sm">Compare plans</Link>
             </div>
           </div>
+          <CouponForm
+            onApplied={(res) => {
+              const months = res.months === 0 ? 'with no end date' : `for ${res.months} month${res.months === 1 ? '' : 's'}`;
+              setPlanMsg(`Coupon applied. You’re on the ${PLAN_NAMES[res.plan]} plan ${months}.`);
+              refresh();
+            }}
+          />
         </SectionCard>
       </div>
     </>

@@ -18,7 +18,9 @@ function RegisterForm() {
   const initialPlan = PLANS.some((p) => p.id === params.get('plan')) ? params.get('plan') : 'starter';
   const billingCycle = params.get('billing') === 'annual' ? 'annual' : 'monthly';
 
-  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '', plan: initialPlan });
+  const initialCoupon = (params.get('coupon') || '').toUpperCase();
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '', plan: initialPlan, coupon: initialCoupon });
+  const [showCoupon, setShowCoupon] = useState(Boolean(initialCoupon));
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -155,8 +157,31 @@ function RegisterForm() {
             </label>
           ))}
         </div>
-        <p className="hint">You can change your plan later. You’ll pay when you subscribe from your dashboard.</p>
+        <p className="hint">
+          {form.coupon.trim()
+            ? 'Your coupon sets the plan. You can change it later.'
+            : 'You can change your plan later. You’ll pay when you subscribe from your dashboard.'}
+        </p>
       </fieldset>
+
+      {showCoupon ? (
+        <div>
+          <label htmlFor="coupon" className="label">Coupon code</label>
+          <input
+            id="coupon"
+            value={form.coupon}
+            onChange={set('coupon')}
+            className="input font-mono uppercase"
+            placeholder="RW-XXXXXXXX"
+            autoCapitalize="characters"
+            spellCheck={false}
+          />
+        </div>
+      ) : (
+        <button type="button" onClick={() => setShowCoupon(true)} className="link text-sm">
+          Have a coupon code?
+        </button>
+      )}
 
       <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
         {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}

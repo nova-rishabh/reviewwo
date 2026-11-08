@@ -7,6 +7,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import RazorpayCheckoutButton from '../../components/RazorpayCheckoutButton';
 import useSession from '../../components/useSession';
+import { FaqSection } from '../../components/content';
 
 const plans = [
   {
@@ -16,7 +17,7 @@ const plans = [
     annual: 119,
     description: 'For a single counter or reception desk.',
     features: [
-      '1 NFC card',
+      '1 review QR code',
       'Review page for your business',
       'Private feedback inbox',
       'WhatsApp alerts to your manager',
@@ -31,7 +32,7 @@ const plans = [
     annual: 239,
     popular: true,
     description: 'For places with several counters or tables.',
-    features: ['Up to 5 NFC cards', 'Scans compared card by card', 'Everything in Starter'],
+    features: ['Up to 5 review QR codes', 'Scans compared code by code', 'Everything in Starter'],
   },
   {
     id: 'agency',
@@ -39,7 +40,34 @@ const plans = [
     monthly: 799,
     annual: 639,
     description: 'For large venues with many tables or rooms.',
-    features: ['Up to 25 NFC cards', 'Everything in Growth', 'Bulk card pricing'],
+    features: ['Up to 25 review QR codes', 'Everything in Growth'],
+  },
+];
+
+const PRICING_FAQS = [
+  {
+    q: 'How much does a Google review QR code cost with Reviewwo?',
+    a: 'Plans start at ₹149 a month for one QR code, ₹299 a month for up to five and ₹799 a month for up to 25. Paying yearly lowers each plan by 20%.',
+  },
+  {
+    q: 'Are NFC cards included in the plan?',
+    a: 'No. Plans include QR codes only, which you download and print yourself. NFC cards are an optional extra at ₹50 per card plus delivery, ordered from your dashboard.',
+  },
+  {
+    q: 'Can I start without paying?',
+    a: 'Yes. You can create an account, complete setup and create your first QR code before you pay. Subscribe from Settings when you are ready.',
+  },
+  {
+    q: 'How do I pay?',
+    a: 'Payments are handled by Razorpay, which accepts UPI, cards and net banking.',
+  },
+  {
+    q: 'Can I change plans later?',
+    a: 'Yes. Pick a different plan from the pricing page or your Settings. If you need more QR codes, move to a plan that includes them.',
+  },
+  {
+    q: 'What happens if I reach my QR code limit?',
+    a: 'Your existing QR codes keep working. You will not be able to create more until you move to a plan with a higher limit or remove one you no longer use.',
   },
 ];
 
@@ -57,7 +85,7 @@ export default function PricingPage() {
             <div>
               <h1 className="text-4xl font-bold leading-[1.1] sm:text-5xl">Pricing</h1>
               <p className="mt-4 max-w-xl text-lg text-ink-muted">
-                Prices in Indian rupees. NFC cards are ordered separately.
+                Prices in Indian rupees. Plans include QR codes that you print yourself.
               </p>
             </div>
 
@@ -148,6 +176,64 @@ export default function PricingPage() {
             })}
           </div>
         </section>
+
+        <section className="pb-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="flex flex-col items-start justify-between gap-4 rounded-[10px] border border-line bg-canvas px-5 py-4 sm:flex-row sm:items-center">
+              <p className="text-[15px] text-ink-muted">
+                <span className="font-semibold text-ink">NFC cards are not included in any plan.</span> Want customers to tap
+                instead of scan? Add NFC cards for ₹50 each plus delivery.
+              </p>
+              <Link href="/nfc-cards" className="btn btn-secondary btn-sm shrink-0">About NFC cards</Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-line py-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <h2 className="text-3xl font-bold">Compare plans</h2>
+            <div className="mt-8 overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
+                <thead>
+                  <tr className="border-b border-line">
+                    <th className="py-3 pr-4 font-semibold text-ink">Included</th>
+                    <th className="py-3 pr-4 font-semibold text-ink">Starter</th>
+                    <th className="py-3 pr-4 font-semibold text-ink">Growth</th>
+                    <th className="py-3 font-semibold text-ink">Agency</th>
+                  </tr>
+                </thead>
+                <tbody className="text-ink-muted">
+                  {[
+                    ['Review QR codes', '1', '5', '25'],
+                    ['Review page for your business', 'Yes', 'Yes', 'Yes'],
+                    ['Private feedback inbox', 'Yes', 'Yes', 'Yes'],
+                    ['WhatsApp alerts to your manager', 'Yes', 'Yes', 'Yes'],
+                    ['Scans per QR code', 'Yes', 'Yes', 'Yes'],
+                    ['NFC cards', 'Not included', 'Not included', 'Not included'],
+                    ['PNG and SVG QR downloads', 'Yes', 'Yes', 'Yes'],
+                    ['Monthly price', '₹149', '₹299', '₹799'],
+                    ['Yearly price, per month', '₹119', '₹239', '₹639'],
+                  ].map(([label, ...vals]) => (
+                    <tr key={label} className="border-b border-line">
+                      <td className="py-3 pr-4 font-medium text-ink">{label}</td>
+                      {vals.map((v, i) => (
+                        <td key={i} className="py-3 pr-4">{v}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-sm text-ink-subtle">
+              Not sure how many QR codes you need? See placement advice for{' '}
+              <Link href="/for/restaurants" className="link">restaurants</Link>,{' '}
+              <Link href="/for/cafes" className="link">cafés</Link> and{' '}
+              <Link href="/for" className="link">other businesses</Link>.
+            </p>
+          </div>
+        </section>
+
+        <FaqSection faqs={PRICING_FAQS} tinted />
       </main>
       <Footer />
     </div>

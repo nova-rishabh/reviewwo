@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Inbox, CreditCard, Settings, MessageCircle, Menu, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, Inbox, QrCode, Nfc, Settings, MessageCircle, Menu, X, LogOut, Shield } from 'lucide-react';
 import { apiGet } from './api';
 
 const SessionContext = createContext({ user: null, refresh: () => {} });
@@ -12,11 +12,15 @@ export const useDashboardUser = () => useContext(SessionContext);
 const NAV = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Feedback', href: '/dashboard/feedback', icon: Inbox },
-  { label: 'Cards', href: '/dashboard/cards', icon: CreditCard },
+  { label: 'QR codes', href: '/dashboard/cards', icon: QrCode },
+  { label: 'Order NFC cards', href: '/dashboard/nfc', icon: Nfc },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 const PLAN_LABELS = { starter: 'Starter', growth: 'Growth', agency: 'Agency' };
-const ADMIN_NAV = [{ label: 'WhatsApp sender', href: '/dashboard/whatsapp', icon: MessageCircle }];
+const ADMIN_NAV = [
+  { label: 'Admin', href: '/dashboard/admin', icon: Shield },
+  { label: 'WhatsApp sender', href: '/dashboard/whatsapp', icon: MessageCircle },
+];
 
 function NavLinks({ pathname, isAdmin, openCount }) {
   const items = isAdmin ? [...NAV, ...ADMIN_NAV] : NAV;
