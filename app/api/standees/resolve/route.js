@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server';
 import { loadData, saveData } from '../../../../src/lib/store.js';
+import { publicBusiness, DEMO_OWNER } from '../../../../src/lib/branding.js';
 
 export const dynamic = 'force-dynamic';
 
-const DEMO = {
-  name: 'The Corner Café',
-  city: 'Bengaluru',
-  category: 'cafe',
-  placeId: '',
-  cardName: 'Demo card',
-};
+const DEMO = publicBusiness(DEMO_OWNER, { name: 'Demo card' });
 
 /**
  * Public: looks up the business behind a card code for the customer review page.
@@ -40,12 +35,6 @@ export async function GET(request) {
   return NextResponse.json({
     found: true,
     demo: false,
-    business: {
-      name: owner.businessName || 'Our business',
-      city: owner.city || '',
-      category: owner.category || '',
-      placeId: owner.googlePlaceId || '',
-      cardName: card.name || '',
-    },
+    business: publicBusiness(owner, card),
   });
 }

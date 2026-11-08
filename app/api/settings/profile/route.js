@@ -7,6 +7,7 @@ import {
   isValidPlaceId,
   publicUser,
 } from '../../../../src/lib/store.js';
+import { cleanKeywords, isHexColor, isValidLogo, MAX_LOGO_BYTES } from '../../../../src/lib/branding.js';
 
 const CATEGORIES = ['restaurant', 'cafe', 'salon', 'clinic', 'retail', 'hotel', 'gym', 'other'];
 
@@ -48,6 +49,25 @@ export async function POST(request) {
       const v = text(body.googlePlaceId, 300);
       if (v && !isValidPlaceId(v)) errors.googlePlaceId = 'This doesn’t look like a Place ID. It usually starts with “ChIJ”.';
       else record.googlePlaceId = v;
+    }
+    if ('brandName' in body) {
+      record.brandName = text(body.brandName, 80);
+    }
+    if ('brandColor' in body) {
+      if (body.brandColor && !isHexColor(body.brandColor)) errors.brandColor = 'Pick a colour.';
+      else record.brandColor = body.brandColor || '';
+    }
+    if ('brandAccent' in body) {
+      if (body.brandAccent && !isHexColor(body.brandAccent)) errors.brandAccent = 'Pick a colour.';
+      else record.brandAccent = body.brandAccent || '';
+    }
+    if ('brandLogo' in body) {
+      if (body.brandLogo && !isValidLogo(body.brandLogo)) {
+        errors.brandLogo = `Use a PNG, JPG or WebP image under ${Math.round(MAX_LOGO_BYTES / 1024)} KB.`;
+      } else record.brandLogo = body.brandLogo || '';
+    }
+    if ('reviewKeywords' in body) {
+      record.reviewKeywords = cleanKeywords(body.reviewKeywords);
     }
     if ('alertName' in body) {
       record.alertName = text(body.alertName, 80);

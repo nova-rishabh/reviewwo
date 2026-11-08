@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Leave a review',
+  title: { absolute: 'Leave a review' },
   robots: { index: false, follow: false },
 };
 

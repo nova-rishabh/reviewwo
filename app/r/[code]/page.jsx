@@ -1,27 +1,10 @@
 'use client';
 
 import { use, useEffect, useRef, useState } from 'react';
-import { Star, Check, Loader2 } from 'lucide-react';
-
-const TAGS = {
-  restaurant: ['Tasty food', 'Friendly staff', 'Quick service', 'Good portions', 'Nice ambience', 'Good value'],
-  cafe: ['Great coffee', 'Friendly staff', 'Cosy place', 'Quick service', 'Tasty snacks', 'Good value'],
-  salon: ['Great result', 'Friendly staff', 'Clean and hygienic', 'On time', 'Relaxing', 'Good value'],
-  clinic: ['Caring doctor', 'Clear explanation', 'Short wait', 'Clean clinic', 'Helpful staff'],
-  retail: ['Good range', 'Helpful staff', 'Fair prices', 'Quick billing', 'Easy to find things'],
-  hotel: ['Clean room', 'Helpful staff', 'Comfortable stay', 'Good location', 'Good breakfast'],
-  gym: ['Good equipment', 'Helpful trainers', 'Clean space', 'Not crowded', 'Good value'],
-  other: ['Friendly staff', 'Quick service', 'Good quality', 'Good value', 'Would come back'],
-};
+import { Star, Check, Loader2, Sparkles } from 'lucide-react';
+import { textOn, DEFAULT_BRAND_COLOR, DEFAULT_ACCENT_COLOR } from '../../../src/lib/branding';
 
 const RATING_WORDS = ['', 'Poor', 'Not great', 'Okay', 'Good', 'Excellent'];
-
-function joinTags(tags) {
-  if (!tags.length) return '';
-  const lower = tags.map((t, i) => (i === 0 ? t : t.charAt(0).toLowerCase() + t.slice(1)));
-  const text = lower.length === 1 ? lower[0] : `${lower.slice(0, -1).join(', ')} and ${lower[lower.length - 1]}`;
-  return `${text}.`;
-}
 
 async function copyText(text) {
   try {
@@ -48,7 +31,12 @@ async function copyText(text) {
   }
 }
 
-function RatingPicker({ value, onChange }) {
+/** Solid button in the business's own colour. */
+function brandButton(color) {
+  return { background: color, color: textOn(color), borderColor: color };
+}
+
+function RatingPicker({ value, onChange, accent }) {
   return (
     <div role="radiogroup" aria-label="Your rating" className="flex justify-center gap-1">
       {[1, 2, 3, 4, 5].map((n) => (
@@ -61,85 +49,121 @@ function RatingPicker({ value, onChange }) {
           onClick={() => onChange(n)}
           className="rounded-lg p-1.5 transition-transform active:scale-90"
         >
-          <Star className={`h-10 w-10 ${n <= value ? 'fill-marigold text-marigold' : 'text-line'}`} strokeWidth={1.5} />
+          <Star
+            className="h-10 w-10"
+            style={n <= value ? { color: accent, fill: accent } : { color: '#DCE3E1' }}
+            strokeWidth={1.5}
+          />
         </button>
       ))}
     </div>
   );
 }
 
-function GoogleReview({ business, demo, rating, primary }) {
-  const tags = TAGS[business.category] || TAGS.other;
+function ReviewComposer({ code, business, demo, rating, primary }) {
   const [picked, setPicked] = useState([]);
   const [text, setText] = useState('');
-  const [edited, setEdited] = useState(false);
+  const [ai, setAi] = useState({ state: 'idle', error: '' });
   const [copied, setCopied] = useState(false);
+  const color = business.color;
 
-  const toggle = (t) => {
-    const next = picked.includes(t) ? picked.filter((x) => x !== t) : [...picked, t];
-    setPicked(next);
-    if (!edited) setText(joinTags(next));
+  const toggle = (t) => setPicked((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+
+  const useAi = async () => {
+    setAi({ state: 'writing', error: '' });
+    try {
+      const res = await fetch('/api/reviews/generate-drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, rating, keywords: picked, notes: text }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'That didn’t work. Please try again.');
+      if (data.text) setText(data.text);
+      setAi({ state: 'done', error: '' });
+    } catch (err) {
+      setAi({ state: 'idle', error: err.message });
+    }
   };
 
   const href = business.placeId
     ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(business.placeId)}`
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name} ${business.city}`)}`;
 
-  const onOpen = async (e) => {
+  const onPost = async (e) => {
     if (demo) {
       e.preventDefault();
       setCopied(true);
       return;
     }
-    if (text.trim()) {
-      const ok = await copyText(text.trim());
-      setCopied(ok);
-    }
+    if (text.trim()) setCopied(await copyText(text.trim()));
   };
 
+  const canWrite = picked.length > 0 || text.trim().length > 0;
+
   return (
-    <section className="space-y-4">
-      {primary && rating >= 4 && (
-        <div>
-          <p className="text-[15px] font-medium text-ink">What stood out? (optional)</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {tags.map((t) => {
-              const on = picked.includes(t);
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => toggle(t)}
-                  className={`h-9 rounded-full px-3.5 text-sm font-medium transition-colors ${
-                    on ? 'bg-brand-800 text-white' : 'border border-line bg-white text-ink'
-                  }`}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
+    <section className="space-y-5">
+      <div>
+        <p className="text-[15px] font-medium text-ink">{rating >= 4 ? 'What did you like?' : 'What stood out?'}</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {business.keywords.map((t) => {
+            const on = picked.includes(t);
+            return (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggle(t)}
+                style={on ? brandButton(color) : undefined}
+                className={`inline-flex h-9 items-center gap-1 rounded-full border px-3.5 text-sm font-medium transition-colors ${
+                  on ? '' : 'border-line bg-white text-ink'
+                }`}
+              >
+                {on && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+                {t}
+              </button>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       <div>
-        <label htmlFor="review-text" className="text-[15px] font-medium text-ink">
-          Your review
-        </label>
+        <div className="flex items-end justify-between gap-3">
+          <label htmlFor="review-text" className="text-[15px] font-medium text-ink">
+            Your review
+          </label>
+          <button
+            type="button"
+            onClick={useAi}
+            disabled={!canWrite || ai.state === 'writing'}
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold transition-opacity disabled:opacity-40"
+            style={{ borderColor: color, color }}
+          >
+            {ai.state === 'writing' ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+            )}
+            {ai.state === 'writing' ? 'Writing…' : ai.state === 'done' ? 'Try again' : 'Use AI'}
+          </button>
+        </div>
         <textarea
           id="review-text"
-          rows={4}
+          rows={5}
           value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            setEdited(true);
-          }}
-          placeholder="Write a few words about your visit"
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Tap a few highlights above and press Use AI, or write a few words yourself."
           className="input mt-2 text-[15px]"
+          aria-describedby="review-help"
         />
-        <p className="mt-1.5 text-[13px] text-ink-subtle">
-          We’ll copy this for you. On Google, choose your stars, paste it in and post.
+        <p id="review-help" className="mt-1.5 text-[13px] text-ink-subtle" aria-live="polite">
+          {ai.error ? (
+            <span className="text-red-700">{ai.error}</span>
+          ) : ai.state === 'done' ? (
+            'Read it over and change anything you like. It’s your review.'
+          ) : (
+            'You can edit the text before posting.'
+          )}
         </p>
       </div>
 
@@ -147,22 +171,29 @@ function GoogleReview({ business, demo, rating, primary }) {
         href={href}
         target="_blank"
         rel="noreferrer"
-        onClick={onOpen}
-        className={`btn btn-lg w-full ${primary ? 'btn-primary' : 'btn-secondary'}`}
+        onClick={onPost}
+        style={primary ? brandButton(color) : undefined}
+        className={`btn btn-lg w-full ${primary ? '' : 'btn-secondary'}`}
       >
-        {text.trim() ? 'Copy and open Google reviews' : 'Open Google reviews'}
+        {text.trim() ? 'Copy and post review' : 'Post review'}
       </a>
-      {copied && (
-        <p className="flex items-center justify-center gap-1.5 text-sm text-emerald-800" role="status">
-          <Check className="h-4 w-4" aria-hidden="true" />
-          {demo ? 'This is a demo, so Google isn’t opened.' : 'Copied. Paste it into the review box on Google.'}
+      {copied ? (
+        <p className="flex items-center justify-center gap-1.5 text-center text-sm text-emerald-800" role="status">
+          <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {demo ? 'This is a demo, so nothing is posted.' : 'Copied. Choose your stars, paste it in and tap Post.'}
         </p>
+      ) : (
+        text.trim() && (
+          <p className="text-center text-[13px] text-ink-subtle">
+            We’ll copy your review. On the next page, choose your stars, paste it in and tap Post.
+          </p>
+        )
       )}
     </section>
   );
 }
 
-function ManagerMessage({ code, rating, businessName, demo, primary }) {
+function FeedbackForm({ code, rating, business, demo, primary }) {
   const [feedback, setFeedback] = useState('');
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
@@ -180,7 +211,7 @@ function ManagerMessage({ code, rating, businessName, demo, primary }) {
         body: JSON.stringify({ code, rating, feedback, name, contact }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Your message could not be sent. Please try again.');
+      if (!res.ok) throw new Error(data.error || 'That didn’t go through. Please try again.');
       setState('sent');
     } catch (err) {
       setError(err.message);
@@ -191,9 +222,9 @@ function ManagerMessage({ code, rating, businessName, demo, primary }) {
   if (state === 'sent') {
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900" role="status">
-        <p className="font-semibold">Thanks, your message has been sent to the manager.</p>
+        <p className="font-semibold">Thank you for your feedback.</p>
         <p className="mt-1 text-[15px]">
-          {demo ? 'This is a demo, so nothing was actually sent.' : contact ? 'They may get in touch with you.' : 'They will read it shortly.'}
+          {demo ? 'This is a demo, so nothing was actually sent.' : contact ? 'We may get in touch with you.' : 'We read every message.'}
         </p>
       </div>
     );
@@ -203,14 +234,12 @@ function ManagerMessage({ code, rating, businessName, demo, primary }) {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <h2 className="font-sans text-lg font-semibold text-ink">
-          {primary ? 'Tell the manager what happened' : 'Or send a private message to the manager'}
+          {primary ? 'What could we do better?' : 'Tell us privately'}
         </h2>
-        <p className="mt-1 text-[15px] text-ink-muted">
-          This goes straight to the manager at {businessName}. It is not posted publicly.
-        </p>
+        <p className="mt-1 text-[15px] text-ink-muted">Shared privately with our team.</p>
       </div>
       <div>
-        <label htmlFor="fb" className="label">Your message</label>
+        <label htmlFor="fb" className="label">Your feedback</label>
         <textarea id="fb" required rows={4} value={feedback} onChange={(e) => setFeedback(e.target.value)} className="input text-[15px]" />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -224,11 +253,27 @@ function ManagerMessage({ code, rating, businessName, demo, primary }) {
         </div>
       </div>
       {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
-      <button type="submit" disabled={state === 'sending'} className={`btn btn-lg w-full ${primary ? 'btn-primary' : 'btn-secondary'}`}>
+      <button
+        type="submit"
+        disabled={state === 'sending'}
+        style={primary ? brandButton(business.color) : undefined}
+        className={`btn btn-lg w-full ${primary ? '' : 'btn-secondary'}`}
+      >
         {state === 'sending' && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-        Send to the manager
+        Send feedback
       </button>
     </form>
+  );
+}
+
+function PoweredBy() {
+  return (
+    <footer className="pb-6 text-center text-xs text-ink-subtle">
+      Powered by{' '}
+      <a href="/" target="_blank" rel="noreferrer" className="font-semibold text-ink-muted hover:underline">
+        Reviewwo
+      </a>
+    </footer>
   );
 }
 
@@ -238,7 +283,7 @@ export default function ReviewPage({ params }) {
   const [business, setBusiness] = useState(null);
   const [demo, setDemo] = useState(false);
   const [rating, setRating] = useState(0);
-  const [showPrivate, setShowPrivate] = useState(false);
+  const [showAlt, setShowAlt] = useState(false);
   const counted = useRef(false);
 
   useEffect(() => {
@@ -256,7 +301,12 @@ export default function ReviewPage({ params }) {
       .then((r) => r.json())
       .then((d) => {
         if (d?.found) {
-          setBusiness(d.business);
+          setBusiness({
+            ...d.business,
+            color: d.business.color || DEFAULT_BRAND_COLOR,
+            accent: d.business.accent || DEFAULT_ACCENT_COLOR,
+            keywords: d.business.keywords || [],
+          });
           setDemo(Boolean(d.demo));
           setStatus('ready');
         } else setStatus('missing');
@@ -270,16 +320,19 @@ export default function ReviewPage({ params }) {
 
   if (status !== 'ready') {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
-        <div className="max-w-sm">
-          <h1 className="text-2xl font-bold">{status === 'missing' ? 'This code isn’t set up yet' : 'Something went wrong'}</h1>
-          <p className="mt-2 text-ink-muted">
-            {status === 'missing'
-              ? 'Please let a member of staff know. Thank you for wanting to leave a review.'
-              : 'Check your connection and try scanning again.'}
-          </p>
-        </div>
-      </main>
+      <div className="flex min-h-screen flex-col bg-white">
+        <main className="flex flex-1 items-center justify-center px-6 text-center">
+          <div className="max-w-sm">
+            <h1 className="text-2xl font-bold">{status === 'missing' ? 'This code isn’t set up yet' : 'Something went wrong'}</h1>
+            <p className="mt-2 text-ink-muted">
+              {status === 'missing'
+                ? 'Please let a member of staff know. Thank you for wanting to leave a review.'
+                : 'Check your connection and try scanning again.'}
+            </p>
+          </div>
+        </main>
+        <PoweredBy />
+      </div>
     );
   }
 
@@ -288,14 +341,18 @@ export default function ReviewPage({ params }) {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {demo && (
-        <div className="bg-brand-800 px-4 py-2 text-center text-[13px] text-white">
+        <div className="px-4 py-2 text-center text-[13px]" style={brandButton(business.color)}>
           Demo page. Nothing you enter here is sent or posted.
         </div>
       )}
-      <main className="mx-auto w-full max-w-md flex-1 px-5 pb-12 pt-10">
+      <div className="h-1.5 w-full" style={{ background: business.color }} aria-hidden="true" />
+      <main className="mx-auto w-full max-w-md flex-1 px-5 pb-12 pt-8">
         <header className="text-center">
-          <p className="text-sm text-ink-subtle">{business.city || 'Thanks for visiting'}</p>
-          <h1 className="mt-1 text-[1.75rem] font-bold leading-tight">{business.name}</h1>
+          {business.logo && (
+            <img src={business.logo} alt="" className="mx-auto mb-3 h-16 w-16 rounded-xl object-contain" />
+          )}
+          <h1 className="text-[1.75rem] font-bold leading-tight">{business.name}</h1>
+          {business.city && <p className="mt-1 text-sm text-ink-subtle">{business.city}</p>}
         </header>
 
         <section className="mt-8 text-center">
@@ -303,9 +360,10 @@ export default function ReviewPage({ params }) {
           <div className="mt-3">
             <RatingPicker
               value={rating}
+              accent={business.accent}
               onChange={(n) => {
                 setRating(n);
-                setShowPrivate(false);
+                setShowAlt(false);
               }}
             />
           </div>
@@ -318,22 +376,26 @@ export default function ReviewPage({ params }) {
           <div className="mt-6 space-y-8">
             {low ? (
               <>
-                <ManagerMessage code={code} rating={rating} businessName={business.name} demo={demo} primary />
+                <FeedbackForm code={code} rating={rating} business={business} demo={demo} primary />
                 <div className="border-t border-line pt-6">
-                  <h2 className="font-sans text-lg font-semibold text-ink">Want to leave a Google review too?</h2>
-                  <p className="mb-4 mt-1 text-[15px] text-ink-muted">You can post your review publicly on Google as well.</p>
-                  <GoogleReview business={business} demo={demo} rating={rating} primary={false} />
+                  {showAlt ? (
+                    <ReviewComposer code={code} business={business} demo={demo} rating={rating} primary={false} />
+                  ) : (
+                    <button type="button" onClick={() => setShowAlt(true)} className="text-[15px] font-semibold text-ink-muted underline-offset-2 hover:underline">
+                      Want to post a public review instead?
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
               <>
-                <GoogleReview business={business} demo={demo} rating={rating} primary />
+                <ReviewComposer code={code} business={business} demo={demo} rating={rating} primary />
                 <div className="border-t border-line pt-6">
-                  {showPrivate ? (
-                    <ManagerMessage code={code} rating={rating} businessName={business.name} demo={demo} primary={false} />
+                  {showAlt ? (
+                    <FeedbackForm code={code} rating={rating} business={business} demo={demo} primary={false} />
                   ) : (
-                    <button type="button" onClick={() => setShowPrivate(true)} className="link text-[15px]">
-                      Something we could do better? Message the manager
+                    <button type="button" onClick={() => setShowAlt(true)} className="text-[15px] font-semibold text-ink-muted underline-offset-2 hover:underline">
+                      Anything we could do better? Tell us privately
                     </button>
                   )}
                 </div>
@@ -342,9 +404,7 @@ export default function ReviewPage({ params }) {
           </div>
         )}
       </main>
-      <footer className="pb-6 text-center text-xs text-ink-subtle">
-        Review page by Reviewwo. Google is a trademark of Google LLC.
-      </footer>
+      <PoweredBy />
     </div>
   );
 }

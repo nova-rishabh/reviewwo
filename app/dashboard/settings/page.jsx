@@ -2,11 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Loader2 } from 'lucide-react';
+import { ExternalLink, Loader2, X, Plus, Star, ImagePlus } from 'lucide-react';
 import { PageHeader, useDashboardUser } from '../../../components/DashboardShell';
 import { apiPost, CATEGORIES, googleReviewUrl, PLACE_ID_FINDER_URL } from '../../../components/api';
 import { SectionCard, ErrorNote } from '../../../components/ui';
 import RazorpayCheckoutButton from '../../../components/RazorpayCheckoutButton';
+import {
+  DEFAULT_KEYWORDS,
+  DEFAULT_BRAND_COLOR,
+  DEFAULT_ACCENT_COLOR,
+  MAX_KEYWORDS,
+  MAX_KEYWORD_LENGTH,
+  textOn,
+} from '../../../src/lib/branding';
 
 const local = (m) => String(m || '').replace(/^\+91/, '');
 
@@ -61,6 +69,282 @@ function planLine(user) {
     return user.planStatus === 'expired' ? `free with a coupon, ended ${d}` : `free with a coupon until ${d}`;
   }
   return user.billingCycle === 'annual' ? 'billed yearly' : 'billed monthly';
+}
+
+/** Shrinks an uploaded image to fit 256x256 and returns a WebP (or PNG) data URL. */
+function resizeLogo(file) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+      reject(new Error('Use a PNG, JPG or WebP image.'));
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 256 / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      let data = canvas.toDataURL('image/webp', 0.9);
+      if (!data.startsWith('data:image/webp')) data = canvas.toDataURL('image/png');
+      resolve(data);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('That image could not be read.'));
+    };
+    img.src = url;
+  });
+}
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
+
+function ColorField({ id, label, value, fallback, onChange, hint }) {
+  const v = value || fallback;
+  return (
+    <div>
+      <label htmlFor={id} className="label">{label}</label>
+      <div className="flex items-center gap-2">
+        <input
+          id={id}
+          type="color"
+          value={HEX.test(v) ? v : fallback}
+          onChange={(e) => onChange(e.target.value.toUpperCase())}
+          className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border border-line bg-white p-1"
+        />
+        <input
+          aria-label={`${label} hex code`}
+          value={v}
+          onChange={(e) => onChange(e.target.value)}
+          className="input font-mono text-[13px] uppercase"
+          maxLength={7}
+          spellCheck={false}
+        />
+      </div>
+      {hint && <p className="hint">{hint}</p>}
+    </div>
+  );
+}
+
+function BrandingSection({ user }) {
+  const { refresh } = useDashboardUser();
+  const [v, setV] = useState({
+    brandName: user.brandName || '',
+    brandLogo: user.brandLogo || '',
+    brandColor: user.brandColor || '',
+    brandAccent: user.brandAccent || '',
+  });
+  const [state, setState] = useState({ saving: false, error: '', saved: false });
+  const set = (k, val) => {
+    setV((x) => ({ ...x, [k]: val }));
+    setState((s) => ({ ...s, saved: false }));
+  };
+
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      set('brandLogo', await resizeLogo(file));
+    } catch (err) {
+      setState({ saving: false, error: err.message, saved: false });
+    }
+  };
+
+  const save = async (e) => {
+    e.preventDefault();
+    setState({ saving: true, error: '', saved: false });
+    try {
+      await apiPost('/api/settings/profile', v);
+      setState({ saving: false, error: '', saved: true });
+      refresh();
+    } catch (err) {
+      setState({ saving: false, error: err.message, saved: false });
+    }
+  };
+
+  const color = HEX.test(v.brandColor) ? v.brandColor : DEFAULT_BRAND_COLOR;
+  const accent = HEX.test(v.brandAccent) ? v.brandAccent : DEFAULT_ACCENT_COLOR;
+  const shownName = v.brandName.trim() || user.businessName || 'Your business';
+
+  return (
+    <form onSubmit={save}>
+      <SectionCard
+        id="branding"
+        title="Review page branding"
+        description="Customers see your name, logo and colours when they scan. Reviewwo only appears as a small “Powered by” line."
+        footer={<SaveFooter state={state} />}
+      >
+        <ErrorNote message={state.error} />
+        <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label htmlFor="brand-name" className="label">Name shown to customers</label>
+              <input
+                id="brand-name"
+                value={v.brandName}
+                onChange={(e) => set('brandName', e.target.value)}
+                className="input"
+                maxLength={80}
+                placeholder={user.businessName}
+              />
+              <p className="hint">Leave empty to use your business name.</p>
+            </div>
+            <div className="sm:col-span-2">
+              <span className="label">Logo</span>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-line bg-canvas">
+                  {v.brandLogo ? (
+                    <img src={v.brandLogo} alt="Your logo" className="h-full w-full object-contain" />
+                  ) : (
+                    <ImagePlus className="h-6 w-6 text-ink-subtle" aria-hidden="true" />
+                  )}
+                </div>
+                <label className="btn btn-secondary btn-sm cursor-pointer">
+                  {v.brandLogo ? 'Change logo' : 'Upload logo'}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} className="sr-only" />
+                </label>
+                {v.brandLogo && (
+                  <button type="button" onClick={() => set('brandLogo', '')} className="btn btn-ghost btn-sm">Remove</button>
+                )}
+              </div>
+              <p className="hint">PNG, JPG or WebP. A square logo works best; it is resized for you.</p>
+            </div>
+            <ColorField
+              id="brand-color"
+              label="Main colour"
+              value={v.brandColor}
+              fallback={DEFAULT_BRAND_COLOR}
+              onChange={(c) => set('brandColor', c)}
+              hint="Buttons and selected highlights."
+            />
+            <ColorField
+              id="brand-accent"
+              label="Star colour"
+              value={v.brandAccent}
+              fallback={DEFAULT_ACCENT_COLOR}
+              onChange={(c) => set('brandAccent', c)}
+              hint="The rating stars."
+            />
+          </div>
+
+          <div aria-hidden="true" className="rounded-2xl border border-line bg-white p-5 text-center">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-ink-subtle">Preview</p>
+            {v.brandLogo && <img src={v.brandLogo} alt="" className="mx-auto mt-3 h-12 w-12 rounded-lg object-contain" />}
+            <p className="mt-2 font-semibold text-ink">{shownName}</p>
+            <div className="mt-2 flex justify-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Star key={n} className="h-5 w-5" style={{ color: accent, fill: n <= 4 ? accent : 'none' }} strokeWidth={1.5} />
+              ))}
+            </div>
+            <div className="mt-3 rounded-lg py-2 text-sm font-semibold" style={{ background: color, color: textOn(color) }}>
+              Post review
+            </div>
+            <p className="mt-3 text-[10px] text-ink-subtle">Powered by Reviewwo</p>
+          </div>
+        </div>
+      </SectionCard>
+    </form>
+  );
+}
+
+function KeywordsSection({ user }) {
+  const { refresh } = useDashboardUser();
+  const suggested = DEFAULT_KEYWORDS[user.category] || DEFAULT_KEYWORDS.other;
+  const [list, setList] = useState(user.reviewKeywords?.length ? user.reviewKeywords : suggested);
+  const [draft, setDraft] = useState('');
+  const [state, setState] = useState({ saving: false, error: '', saved: false });
+
+  const update = (next) => {
+    setList(next);
+    setState({ saving: false, error: '', saved: false });
+  };
+  const add = () => {
+    const k = draft.replace(/\s+/g, ' ').trim().slice(0, MAX_KEYWORD_LENGTH);
+    if (!k) return;
+    if (list.some((x) => x.toLowerCase() === k.toLowerCase())) {
+      setDraft('');
+      return;
+    }
+    if (list.length >= MAX_KEYWORDS) {
+      setState({ saving: false, error: `You can have up to ${MAX_KEYWORDS} highlights.`, saved: false });
+      return;
+    }
+    update([...list, k]);
+    setDraft('');
+  };
+
+  const save = async (e) => {
+    e.preventDefault();
+    if (!list.length) {
+      setState({ saving: false, error: 'Add at least one highlight.', saved: false });
+      return;
+    }
+    setState({ saving: true, error: '', saved: false });
+    try {
+      await apiPost('/api/settings/profile', { reviewKeywords: list });
+      setState({ saving: false, error: '', saved: true });
+      refresh();
+    } catch (err) {
+      setState({ saving: false, error: err.message, saved: false });
+    }
+  };
+
+  return (
+    <form onSubmit={save}>
+      <SectionCard
+        id="keywords"
+        title="Review highlights"
+        description="The words customers can tap to describe their visit. When they tap “Use AI”, a review is written around the ones they picked. Use words you want to be found for, like your best dishes or services."
+        footer={<SaveFooter state={state} />}
+      >
+        <ErrorNote message={state.error} />
+        <ul className="flex flex-wrap gap-2" aria-label="Highlights">
+          {list.map((k) => (
+            <li key={k} className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-white pl-3.5 pr-1.5 text-sm font-medium text-ink">
+              {k}
+              <button
+                type="button"
+                onClick={() => update(list.filter((x) => x !== k))}
+                className="rounded-full p-1 text-ink-subtle hover:bg-canvas hover:text-ink"
+                aria-label={`Remove ${k}`}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <label htmlFor="kw-add" className="sr-only">Add a highlight</label>
+          <input
+            id="kw-add"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                add();
+              }
+            }}
+            maxLength={MAX_KEYWORD_LENGTH}
+            className="input sm:max-w-sm"
+            placeholder="e.g. Best filter coffee"
+          />
+          <button type="button" onClick={add} disabled={!draft.trim()} className="btn btn-secondary">
+            <Plus className="h-4 w-4" aria-hidden="true" /> Add
+          </button>
+        </div>
+        <p className="hint">
+          {list.length} of {MAX_KEYWORDS}. Keep them short and true to what you offer.{' '}
+          <button type="button" className="link" onClick={() => update(suggested)}>Reset to suggestions</button>
+        </p>
+      </SectionCard>
+    </form>
+  );
 }
 
 function CouponForm({ onApplied }) {
@@ -121,11 +405,11 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" description="Your business details, Google listing, alerts and plan." />
+      <PageHeader title="Settings" description="Your business, review page, Google listing, alerts and plan." />
 
       <div className="grid max-w-5xl gap-6">
         <form onSubmit={business.save}>
-          <SectionCard id="business" title="Business" description="Shown to customers when they scan your QR code." footer={<SaveFooter state={business.state} />}>
+          <SectionCard id="business" title="Business" description="Your business details. The AI uses your business type and city when writing reviews." footer={<SaveFooter state={business.state} />}>
             <ErrorNote message={business.state.error} />
             <div className="grid gap-5 md:grid-cols-3">
               <div className="md:col-span-1">
@@ -146,6 +430,10 @@ export default function SettingsPage() {
             </div>
           </SectionCard>
         </form>
+
+        <BrandingSection user={user} />
+
+        <KeywordsSection user={user} />
 
         <form onSubmit={google.save}>
           <SectionCard
