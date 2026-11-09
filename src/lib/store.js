@@ -148,6 +148,7 @@ export function publicUser(u) {
     brandAccent: u.brandAccent || '',
     brandLogo: u.brandLogo || '',
     reviewKeywords: Array.isArray(u.reviewKeywords) ? u.reviewKeywords : [],
+    referenceCode: u.referenceCode || '',
     alertMobile: u.alertMobile || '',
     plan: u.plan || 'starter',
     planStatus: planStatusOf(u),

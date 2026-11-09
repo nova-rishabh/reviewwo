@@ -234,9 +234,8 @@ function FeedbackForm({ code, rating, business, demo, primary }) {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <h2 className="font-sans text-lg font-semibold text-ink">
-          {primary ? 'What could we do better?' : 'Tell us privately'}
+          {primary ? 'What could we do better?' : 'Tell us more'}
         </h2>
-        <p className="mt-1 text-[15px] text-ink-muted">Shared privately with our team.</p>
       </div>
       <div>
         <label htmlFor="fb" className="label">Your feedback</label>
@@ -375,18 +374,7 @@ export default function ReviewPage({ params }) {
         {rating > 0 && (
           <div className="mt-6 space-y-8">
             {low ? (
-              <>
-                <FeedbackForm code={code} rating={rating} business={business} demo={demo} primary />
-                <div className="border-t border-line pt-6">
-                  {showAlt ? (
-                    <ReviewComposer code={code} business={business} demo={demo} rating={rating} primary={false} />
-                  ) : (
-                    <button type="button" onClick={() => setShowAlt(true)} className="text-[15px] font-semibold text-ink-muted underline-offset-2 hover:underline">
-                      Want to post a public review instead?
-                    </button>
-                  )}
-                </div>
-              </>
+              <FeedbackForm code={code} rating={rating} business={business} demo={demo} primary />
             ) : (
               <>
                 <ReviewComposer code={code} business={business} demo={demo} rating={rating} primary />
@@ -395,7 +383,7 @@ export default function ReviewPage({ params }) {
                     <FeedbackForm code={code} rating={rating} business={business} demo={demo} primary={false} />
                   ) : (
                     <button type="button" onClick={() => setShowAlt(true)} className="text-[15px] font-semibold text-ink-muted underline-offset-2 hover:underline">
-                      Anything we could do better? Tell us privately
+                      Anything we could do better? Let us know
                     </button>
                   )}
                 </div>

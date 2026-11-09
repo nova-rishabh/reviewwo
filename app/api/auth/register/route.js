@@ -10,6 +10,7 @@ import {
   PLAN_IDS,
 } from '../../../../src/lib/store.js';
 import { redeemCoupon, listCoupons, normalizeCode } from '../../../../src/lib/coupons.js';
+import { findActiveReference, normalizeRef } from '../../../../src/lib/references.js';
 
 export async function POST(request) {
   try {
@@ -42,6 +43,12 @@ export async function POST(request) {
       }
     }
 
+    const refCode = normalizeRef(body.reference);
+    const reference = refCode ? findActiveReference(refCode) : null;
+    if (refCode && !reference) {
+      return NextResponse.json({ error: 'This reference code isn’t valid. Check it, or leave it empty.' }, { status: 400 });
+    }
+
     const users = loadData('users.json', []);
     if (users.some((u) => u.email && u.email.toLowerCase() === email)) {
       return NextResponse.json({ error: 'An account with this email already exists. Sign in instead.' }, { status: 409 });
@@ -67,6 +74,7 @@ export async function POST(request) {
       planStatus: 'unpaid',
       onboardingComplete: false,
       createdAt: new Date().toISOString(),
+      ...(reference ? { referenceCode: reference.code } : {}),
     };
 
     if (couponCode) redeemCoupon(user, couponCode);

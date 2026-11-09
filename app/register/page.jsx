@@ -19,8 +19,10 @@ function RegisterForm() {
   const billingCycle = params.get('billing') === 'annual' ? 'annual' : 'monthly';
 
   const initialCoupon = (params.get('coupon') || '').toUpperCase();
-  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '', plan: initialPlan, coupon: initialCoupon });
+  const initialRef = (params.get('ref') || '').toUpperCase();
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '', plan: initialPlan, coupon: initialCoupon, reference: initialRef });
   const [showCoupon, setShowCoupon] = useState(Boolean(initialCoupon));
+  const [showRef, setShowRef] = useState(Boolean(initialRef));
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -164,6 +166,22 @@ function RegisterForm() {
         </p>
       </fieldset>
 
+      {showRef ? (
+        <div>
+          <label htmlFor="reference" className="label">Reference code</label>
+          <input
+            id="reference"
+            value={form.reference}
+            onChange={set('reference')}
+            className="input font-mono uppercase"
+            placeholder="REF-XXXXXX"
+            autoCapitalize="characters"
+            spellCheck={false}
+          />
+          <p className="hint">The code from the person who told you about Reviewwo.</p>
+        </div>
+      ) : null}
+
       {showCoupon ? (
         <div>
           <label htmlFor="coupon" className="label">Coupon code</label>
@@ -177,10 +195,21 @@ function RegisterForm() {
             spellCheck={false}
           />
         </div>
-      ) : (
-        <button type="button" onClick={() => setShowCoupon(true)} className="link text-sm">
-          Have a coupon code?
-        </button>
+      ) : null}
+
+      {(!showCoupon || !showRef) && (
+        <div className="flex flex-wrap gap-x-5 gap-y-2">
+          {!showCoupon && (
+            <button type="button" onClick={() => setShowCoupon(true)} className="link text-sm">
+              Have a coupon code?
+            </button>
+          )}
+          {!showRef && (
+            <button type="button" onClick={() => setShowRef(true)} className="link text-sm">
+              Have a reference code?
+            </button>
+          )}
+        </div>
       )}
 
       <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
