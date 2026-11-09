@@ -1,0 +1,155 @@
+{
+  "click": {
+    "file": "click.wav",
+    "title": "SFX UI Button Click",
+    "creator": "suntemple",
+    "openverse_id": "ea9dc47e-7f07-45dd-8aa6-8c9e25609251",
+    "landing_url": "https://freesound.org/people/suntemple/sounds/253168",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "click2": {
+    "file": "click2.wav",
+    "title": "UI Button Click",
+    "creator": "benzix2",
+    "openverse_id": "d3ab488b-dee1-4c40-89ab-67837664b616",
+    "landing_url": "https://freesound.org/people/benzix2/sounds/467951",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "pop": {
+    "file": "pop.wav",
+    "title": "Pop 2",
+    "creator": "greenvwbeetle",
+    "openverse_id": "7b1f829e-4a99-41bc-9b65-50e39c074751",
+    "landing_url": "https://freesound.org/people/greenvwbeetle/sounds/244654",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "pop2": {
+    "file": "pop2.wav",
+    "title": "The Best Bubble Pop Sound For Game and UI",
+    "creator": "el_boss",
+    "openverse_id": "57fc1a1b-320c-4c70-a52c-fee4442d2272",
+    "landing_url": "https://freesound.org/people/el_boss/sounds/669918",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "whoosh": {
+    "file": "whoosh.wav",
+    "title": "Swipe Whoosh",
+    "creator": "qubodup",
+    "openverse_id": "b7ae7822-8ec5-4a82-b6f8-d539b51caa61",
+    "landing_url": "https://freesound.org/people/qubodup/sounds/60007",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "whoosh2": {
+    "file": "whoosh2.wav",
+    "title": "Swosh swoosh whoosh air sound, free, high quality",
+    "creator": "qubodup",
+    "openverse_id": "f1dc6045-7965-41de-87f8-4731d2583fd2",
+    "landing_url": "https://freesound.org/people/qubodup/sounds/60026",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "blip": {
+    "file": "blip.wav",
+    "title": "3rd blip.aiff",
+    "creator": "jack13_89",
+    "openverse_id": "3b463c68-1165-4e27-8878-77ceb6cbc52c",
+    "landing_url": "https://freesound.org/people/jack13_89/sounds/545272",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "shutter": {
+    "file": "shutter.wav",
+    "title": "Camera Shutter",
+    "creator": "roachpowder",
+    "openverse_id": "3290f0e3-a217-48c9-bafb-06401b961c21",
+    "landing_url": "https://freesound.org/people/roachpowder/sounds/170229",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "chime": {
+    "file": "chime.wav",
+    "title": "Chime Notification",
+    "creator": "Jofae",
+    "openverse_id": "adb6e260-e493-43fd-a56e-8ceb4f477fe2",
+    "landing_url": "https://freesound.org/people/Jofae/sounds/380482",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "buzz": {
+    "file": "buzz.wav",
+    "title": "phone short buzz",
+    "creator": "richwise",
+    "openverse_id": "c3af46e7-e083-4dcf-a373-4e645078a5c9",
+    "landing_url": "https://freesound.org/people/richwise/sounds/476836",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "hit": {
+    "file": "hit.wav",
+    "title": "Hit Impact",
+    "creator": "Mrguff",
+    "openverse_id": "7f3dc6f7-0aca-436c-828c-11670ee8b47f",
+    "landing_url": "https://freesound.org/people/Mrguff/sounds/369711",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "boom": {
+    "file": "boom.wav",
+    "title": "BOOM IMPACT 2",
+    "creator": "XHALE303",
+    "openverse_id": "4c99d7d3-4987-46f3-9637-bfd9b4cc66b9",
+    "landing_url": "https://freesound.org/people/XHALE303/sounds/535592",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "magic": {
+    "file": "magic.wav",
+    "title": "Fantasy_ui_Button_3.wav",
+    "creator": "ZenithInfinitiveStudios",
+    "openverse_id": "4beec0d4-ef0f-4969-beef-f329da2b5538",
+    "landing_url": "https://freesound.org/people/ZenithInfinitiveStudios/sounds/376745",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "tick": {
+    "file": "tick.wav",
+    "title": "Metal tick 1",
+    "creator": "kubawolanin",
+    "openverse_id": "b9e2d017-ac1a-4118-8b05-b9bd184858eb",
+    "landing_url": "https://freesound.org/people/kubawolanin/sounds/185611",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "ding": {
+    "file": "ding.wav",
+    "title": "Ding 1",
+    "creator": "greenvwbeetle",
+    "openverse_id": "c78d2cd0-20ba-4b48-a7eb-f1fa716aca1d",
+    "landing_url": "https://freesound.org/people/greenvwbeetle/sounds/241288",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "key": {
+    "file": "key.wav",
+    "title": "typewriter.wav",
+    "creator": "BMacZero",
+    "openverse_id": "96ab6888-981f-42f9-a228-10f36dcce446",
+    "landing_url": "https://freesound.org/people/BMacZero/sounds/160678",
+    "license": "cc0",
+    "source": "freesound"
+  },
+  "key2": {
+    "file": "key2.wav",
+    "title": "Typewriter - single key - type 2.wav",
+    "creator": "yottasounds",
+    "openverse_id": "ac715c8d-3010-45a2-a939-e110a14da389",
+    "landing_url": "https://freesound.org/people/yottasounds/sounds/380137",
+    "license": "cc0",
+    "source": "freesound"
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reviewwo launch film</title>
+<link rel="stylesheet" href="assets/instrument.css">
+<style>
+@font-face { font-family: 'King Rounded'; src: url(assets/king-extraboldrounded.otf) format('opentype'); font-weight: 700 900; font-display: block; }
+@font-face { font-family: 'King Rounded'; src: url(assets/king-rounded.otf) format('opentype'); font-weight: 400 600; font-display: block; }
+:root {
+  --canvas: #F2F5F4; --ink: #13201F; --muted: #4F6260; --subtle: #6E807E; --line: #DCE3E1;
+  --teal: #0B3D3B; --teal5: #14B8A6; --teal1: #D7EEEB; --gold: #F2B705;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--canvas); overflow: hidden; }
+body { font-family: 'Instrument Sans', system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+#stage { position: relative; overflow: hidden; background: var(--canvas); }
+#bg { position: absolute; inset: 0; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#hud { position: absolute; inset: 0; pointer-events: none; }
+.abs { position: absolute; }
+.center { position: absolute; left: 50%; top: 50%; }
+.disp { font-family: 'King Rounded', 'Instrument Sans', sans-serif; font-weight: 800; letter-spacing: -0.01em; }
+
+/* the one shape */
+#shape { position: absolute; overflow: hidden; }
+.layer { position: absolute; left: 50%; top: 50%; }
+
+/* page */
+.star { position: absolute; width: 64px; height: 64px; }
+.star svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.chip { display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 18px; border-radius: 999px;
+  border: 2px solid var(--line); background: #fff; font-size: 21px; font-weight: 600; color: var(--ink); white-space: nowrap; position: absolute; }
+.btn { position: absolute; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-weight: 700; color: #fff; }
+.muted { color: var(--muted); }
+.label { font-size: 21px; font-weight: 600; }
+.caret { display: inline-block; width: 3px; height: 1.05em; vertical-align: -0.15em; margin-left: 2px; }
+
+/* wall cards */
+.wcard { position: absolute; width: 560px; height: 330px; border-radius: 28px; background: #fff; padding: 34px 36px; }
+.avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 22px; color: #fff; }
+
+/* hud */
+#cap { position: absolute; }
+.kicker { font-size: 1em; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal5); }
+.capt { font-family: 'King Rounded', sans-serif; font-weight: 800; color: var(--ink); line-height: 1.04; }
+#cursor { position: absolute; left: 0; top: 0; }
+#cpill { position: absolute; left: 30px; top: 34px; height: 40px; border-radius: 999px; background: var(--ink); color: #fff;
+  font-size: 19px; font-weight: 600; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+.ring { position: absolute; border-radius: 50%; border: 3px solid var(--teal5); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="world"></div>
+  <div id="hud"></div>
+</div>
+<script src="film.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import QrSign from '../components/QrSign';
+import LaunchVideo from '../components/LaunchVideo';
 import { FaqSection, JsonLd } from '../components/content';
 import { pageMetadata, organizationSchema, SITE_URL, SITE_NAME } from '../src/lib/seo';
 import { INDUSTRIES } from '../src/content/industries';
@@ -107,6 +108,23 @@ export default function HomePage() {
             <div className="relative mx-auto w-full max-w-[340px] py-6 lg:py-10">
               <div className="absolute -right-24 top-1/2 hidden h-[120%] w-[95%] -translate-y-1/2 rounded-[40px] bg-canvas lg:block" aria-hidden="true" />
               <QrSign businessName="The Corner Café" className="relative rotate-[3deg]" />
+            </div>
+          </div>
+        </section>
+
+        {/* Launch film */}
+        <section className="border-t border-line bg-white py-16 sm:py-20" aria-labelledby="film-title">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <h2 id="film-title" className="text-3xl font-bold sm:text-4xl">See it in 30 seconds</h2>
+            <p className="mt-3 max-w-xl text-lg text-ink-muted">
+              A customer scans, taps a few words, and AI writes the review. You get unhappy feedback on WhatsApp.
+            </p>
+            <div className="mt-8">
+              <LaunchVideo
+                src="/video/reviewwo-launch.mp4"
+                poster="/video/reviewwo-launch-poster.jpg"
+                title="Reviewwo in 30 seconds: scan, rate, AI-written review, posted"
+              />
             </div>
           </div>
         </section>
